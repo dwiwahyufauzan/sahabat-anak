@@ -23,10 +23,10 @@
     ];
     
     const socialMedia = [
-        { name: 'IG', label: 'Instagram', href: '#', svg: '/src/lib/assets/instagram_icon.png' },
-        { name: 'FB', label: 'Facebook', href: '#', svg: '/src/lib/assets/facebookicon.png' },
-        { name: 'TW', label: 'Twitter', href: '#', svg: '/src/lib/assets/twitter.png' },
-        { name: 'YT', label: 'YouTube', href: '#', svg: '/src/lib/assets/Youtube_logo.png' }
+        { name: 'IG', label: 'Instagram', href: '#', icon: 'photo_camera' },
+        { name: 'FB', label: 'Facebook', href: '#', icon: 'thumb_up' },
+        { name: 'TW', label: 'Twitter', href: '#', icon: 'chat' },
+        { name: 'YT', label: 'YouTube', href: '#', icon: 'play_circle' }
     ];
 </script>
 
@@ -67,7 +67,7 @@
                     href={social.href}
                     aria-label={social.label}
                     class="size-10 rounded-full bg-background-light dark:bg-[#3a2e25] flex items-center justify-center text-[#181411] dark:text-white hover:bg-primary hover:text-white transition-all duration-300">
-                    <img src={social.svg} alt={social.label} class="w-6 h-6" />
+                    <span class="material-symbols-outlined text-lg">{social.icon}</span>
                 </a>
             {/each}
         </div>
