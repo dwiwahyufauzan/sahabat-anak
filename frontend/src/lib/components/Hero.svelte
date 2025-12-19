@@ -1,4 +1,5 @@
 <script>
+  import { base } from '$app/paths';
   import HeroImage from '$lib/assets/hero-image.jpg';
   let visible = $state(false);
   
@@ -44,13 +45,13 @@
         </p>
         
         <div class="flex flex-col sm:flex-row gap-3 lg:gap-4 justify-center lg:justify-start pt-2 lg:pt-4">
-          <a href="/donasi" class="h-12 lg:h-14 px-6 lg:px-8 rounded-2xl bg-orange-500 text-white font-bold text-sm lg:text-base shadow-xl shadow-orange-500/30 hover:bg-orange-600 hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-2">
+          <a href="{base}/donasi" class="h-12 lg:h-14 px-6 lg:px-8 rounded-2xl bg-orange-500 text-white font-bold text-sm lg:text-base shadow-xl shadow-orange-500/30 hover:bg-orange-600 hover:-translate-y-1 transition-all duration-300 flex items-center justify-center gap-2">
             <span>Donasi Sekarang</span>
             <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
             </svg>
           </a>
-          <a href="/relawan" class="h-12 lg:h-14 px-6 lg:px-8 rounded-2xl bg-white border-2 border-gray-200 text-gray-800 font-bold text-sm lg:text-base hover:border-sky-400 hover:text-sky-400 hover:bg-sky-50 transition-all duration-300 flex items-center justify-center gap-2">
+          <a href="{base}/relawan" class="h-12 lg:h-14 px-6 lg:px-8 rounded-2xl bg-white border-2 border-gray-200 text-gray-800 font-bold text-sm lg:text-base hover:border-sky-400 hover:text-sky-400 hover:bg-sky-50 transition-all duration-300 flex items-center justify-center gap-2">
             <span>Gabung Relawan</span>
             <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />

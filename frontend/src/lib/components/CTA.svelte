@@ -1,4 +1,5 @@
 <script>
+  import { base } from '$app/paths';
   console.log('[v0] CTA section loaded');
 </script>
 
@@ -65,11 +66,11 @@
         </p>
         
         <div class="flex flex-col sm:flex-row gap-4 justify-center mb-8">
-          <a href="/donasi" class="group px-8 py-4 rounded-2xl bg-orange-500 text-white font-bold text-lg shadow-xl hover:shadow-2xl hover:bg-orange-400 transition-all duration-300 hover:scale-105 relative overflow-hidden">
+          <a href="{base}/donasi" class="group px-8 py-4 rounded-2xl bg-orange-500 text-white font-bold text-lg shadow-xl hover:shadow-2xl hover:bg-orange-400 transition-all duration-300 hover:scale-105 relative overflow-hidden">
             <span class="relative z-10">Donasi Sekarang</span>
             <div class="absolute inset-0 bg-linear-to-r from-orange-400 to-yellow-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
           </a>
-          <a href="/relawan" class="px-8 py-4 rounded-2xl bg-white/20 backdrop-blur-md border-2 border-white/40 text-white font-bold text-lg hover:bg-white hover:text-indigo-600 transition-all duration-300 hover:scale-105 shadow-lg">
+          <a href="{base}/relawan" class="px-8 py-4 rounded-2xl bg-white/20 backdrop-blur-md border-2 border-white/40 text-white font-bold text-lg hover:bg-white hover:text-indigo-600 transition-all duration-300 hover:scale-105 shadow-lg">
             Jadi Relawan
           </a>
         </div>

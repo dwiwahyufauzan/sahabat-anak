@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { base } from '$app/paths';
   import { page } from '$app/stores';
   import { getProgramBySlug } from '$lib/data/programs';
   
@@ -19,7 +20,7 @@
   <div class="min-h-screen flex items-center justify-center">
     <div class="text-center">
       <h1 class="text-4xl font-bold mb-4">Program tidak ditemukan</h1>
-      <a href="/" class="text-blue-600 hover:underline">Kembali ke beranda</a>
+      <a href="{base}/" class="text-blue-600 hover:underline">Kembali ke beranda</a>
     </div>
   </div>
 {:else}
@@ -77,9 +78,9 @@
         <div class="max-w-5xl mx-auto">
           <!-- Breadcrumb -->
           <div class="mb-6 flex items-center gap-2 text-sm text-slate-600">
-            <a href="/" class="hover:text-blue-600 transition-colors">Beranda</a>
+            <a href="{base}/" class="hover:text-blue-600 transition-colors">Beranda</a>
             <span>/</span>
-            <a href="/program" class="hover:text-blue-600 transition-colors">Program</a>
+            <a href="{base}/program" class="hover:text-blue-600 transition-colors">Program</a>
             <span>/</span>
             <span class="font-semibold">{program.title}</span>
           </div>

@@ -1,4 +1,5 @@
 <script>
+    import { base } from '$app/paths';
     import { programDetails } from '$lib/data/programs';
     import { onMount } from 'svelte';
     
@@ -55,7 +56,7 @@
                         <p class="text-gray-500 dark:text-gray-400 mb-6 line-clamp-3">
                             {program.description}
                         </p>
-                        <a href="/program/{program.slug}" class="inline-flex items-center text-blue-400 font-bold hover:text-blue-600 transition-colors">
+                        <a href="{base}/program/{program.slug}" class="inline-flex items-center text-blue-400 font-bold hover:text-blue-600 transition-colors">
                             Pelajari Lebih Lanjut
                             <span class="material-symbols-outlined ml-1 text-lg">arrow_outward</span>
                         </a>

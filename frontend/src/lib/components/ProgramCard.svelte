@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { base } from '$app/paths';
   import type { Program } from '$lib/types/program';
   
   export let program: Program;
@@ -35,7 +36,7 @@
         <h3 class="text-xl sm:text-2xl font-bold text-text-main mb-2 sm:mb-3">{program.title}</h3>
         <p class="text-sm sm:text-base text-text-sub mb-4 sm:mb-5 md:mb-6 leading-relaxed flex-1">{program.description}</p>
         
-        <a href="/program/{program.slug}" class="w-full py-2.5 sm:py-3 rounded-lg sm:rounded-xl bg-gray-200 hover:bg-blue-400 hover:text-white text-primary text-sm sm:text-base font-bold transition-colors flex items-center justify-center gap-2 group/btn">
+        <a href="{base}/program/{program.slug}" class="w-full py-2.5 sm:py-3 rounded-lg sm:rounded-xl bg-gray-200 hover:bg-blue-400 hover:text-white text-primary text-sm sm:text-base font-bold transition-colors flex items-center justify-center gap-2 group/btn">
             Pelajari Lebih Lanjut
             <span class="material-symbols-outlined text-sm group-hover/btn:translate-x-1 transition-transform">
                 arrow_forward

@@ -1,4 +1,6 @@
 <script>
+  import { base } from '$app/paths';
+  
   function scrollToForm() {
     const form = document.getElementById('volunteer-form');
     if (form) {
@@ -40,7 +42,7 @@
         >
           Gabung Sekarang
         </button>
-        <a href="/program" class="flex items-center justify-center rounded-full h-14 px-10 bg-white text-sky-900 hover:bg-sky-50 transition-all text-lg font-bold shadow-lg">
+        <a href="{base}/program" class="flex items-center justify-center rounded-full h-14 px-10 bg-white text-sky-900 hover:bg-sky-50 transition-all text-lg font-bold shadow-lg">
           Pelajari Program
         </a>
       </div>

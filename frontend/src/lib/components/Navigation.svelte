@@ -1,5 +1,6 @@
 <script>
     import { onMount } from 'svelte';
+    import { base } from '$app/paths';
     
     let mobileMenuOpen = $state(false);
     let scrolled = $state(false);
@@ -20,18 +21,18 @@
     });
     
     const menuItems = [
-        { label: 'Program', href: '/program' },
-        { label: 'Roadmap', href: '/roadmap' },
+        { label: 'Program', href: `${base}/program` },
+        { label: 'Roadmap', href: `${base}/roadmap` },
         {
             label: 'Tentang Kami',
             children: [
-            { label: 'Sejarah', href: '/sejarah' },
-            { label: 'Visi & Misi', href: '/visi-misi' },
-            { label: 'Tim Kami', href: '/tim-kami' }
+            { label: 'Sejarah', href: `${base}/sejarah` },
+            { label: 'Visi & Misi', href: `${base}/visi-misi` },
+            { label: 'Tim Kami', href: `${base}/tim-kami` }
             ]
         },
-        { label: 'Berita', href: '/berita' },
-        { label: 'Kontak Kami', href: '/contact' }
+        { label: 'Berita', href: `${base}/berita` },
+        { label: 'Kontak Kami', href: `${base}/contact` }
     ];
 
     
@@ -59,7 +60,7 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between items-center h-16 md:h-20">
             <!-- Logo -->
-            <a href="/" class="shrink-0 flex items-center gap-2.5 hover:opacity-80 transition-opacity">
+            <a href="{base}/" class="shrink-0 flex items-center gap-2.5 hover:opacity-80 transition-opacity">
                 <img 
                     src="https://www.logoai.com/oss/icons/2021/12/02/u8tXD2V7rro6bok.png" 
                     alt="Logo Sahabat Anak" 
@@ -116,7 +117,7 @@
             
             <!-- CTA Buttons -->
             <div class="hidden lg:flex items-center gap-3">
-                <a href="/relawan" class="px-5 py-2.5 rounded-full border-2 border-primary text-blue-400 font-semibold text-[15px] hover:bg-primary/5 transition-all duration-200">
+                <a href="{base}/relawan" class="px-5 py-2.5 rounded-full border-2 border-primary text-blue-400 font-semibold text-[15px] hover:bg-primary/5 transition-all duration-200">
                     Gabung Relawan
                 </a>
                 <a href="/donasi" class="px-5 py-2.5 rounded-full bg-orange-400 text-white font-semibold text-[15px] shadow-md hover:shadow-lg hover:bg-orange-600 transition-all duration-200">
@@ -183,10 +184,10 @@
 
         <!-- CTA -->
         <div class="pt-4 space-y-3 border-t border-gray-100 mt-4">
-            <a href="/relawan" onclick={toggleMobileMenu} class="flex items-center justify-center w-full px-5 py-3 rounded-full border-2 border-primary text-primary font-semibold">
+            <a href="{base}/relawan" onclick={toggleMobileMenu} class="flex items-center justify-center w-full px-5 py-3 rounded-full border-2 border-primary text-primary font-semibold">
             Gabung Relawan
             </a>
-            <a href="/donasi" onclick={toggleMobileMenu} class="flex items-center justify-center w-full px-5 py-3 rounded-full bg-orange-400 text-white font-semibold shadow-md">
+            <a href="{base}/donasi" onclick={toggleMobileMenu} class="flex items-center justify-center w-full px-5 py-3 rounded-full bg-orange-400 text-white font-semibold shadow-md">
             Donasi Sekarang
             </a>
         </div>

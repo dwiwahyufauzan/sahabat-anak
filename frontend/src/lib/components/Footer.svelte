@@ -1,9 +1,13 @@
+<script>
+    import { base } from '$app/paths';
+</script>
+
 <footer class="bg-gray-950 border-t border-gray-800 pt-16 pb-8">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
             <!-- Brand Info -->
             <div class="space-y-6">
-                <a href="/" class="flex items-center gap-2.5 hover:opacity-80 transition-opacity w-fit">
+                <a href="{base}/" class="flex items-center gap-2.5 hover:opacity-80 transition-opacity w-fit">
                     <div class="w-9 h-9 md:w-10 md:h-10 bg-white rounded-full p-1.5 flex items-center justify-center">
                         <img 
                             src="https://www.logoai.com/oss/icons/2021/12/02/u8tXD2V7rro6bok.png" 
@@ -41,9 +45,9 @@
             <div>
                 <h3 class="font-bold text-white mb-6">Tentang Kami</h3>
                 <ul class="space-y-4 text-sm text-gray-400">
-                    <li><a href="/sejarah" data-sveltekit-reload class="hover:text-blue-400 transition-colors">Sejarah</a></li>
-                    <li><a href="/visi-misi" data-sveltekit-reload class="hover:text-blue-400 transition-colors">Visi & Misi</a></li>
-                    <li><a href="/tim-kami" data-sveltekit-reload class="hover:text-blue-400 transition-colors">Tim Kami</a></li>
+                    <li><a href="{base}/sejarah" data-sveltekit-reload class="hover:text-blue-400 transition-colors">Sejarah</a></li>
+                    <li><a href="{base}/visi-misi" data-sveltekit-reload class="hover:text-blue-400 transition-colors">Visi & Misi</a></li>
+                    <li><a href="{base}/tim-kami" data-sveltekit-reload class="hover:text-blue-400 transition-colors">Tim Kami</a></li>
                 </ul>
             </div>
             
@@ -51,10 +55,10 @@
             <div>
                 <h3 class="font-bold text-white mb-6">Program</h3>
                 <ul class="space-y-4 text-sm text-gray-400">
-                    <li><a href="/program/empowerment" data-sveltekit-reload class="hover:text-blue-400 transition-colors">Empowerment</a></li>
-                    <li><a href="/program/character-building" data-sveltekit-reload class="hover:text-blue-400 transition-colors">Character Building</a></li>
-                    <li><a href="/program/community-engagement" data-sveltekit-reload class="hover:text-blue-400 transition-colors">Community Engagement</a></li>
-                    <li><a href="/program/future-leadership" data-sveltekit-reload class="hover:text-blue-400 transition-colors">Future Leadership</a></li>
+                    <li><a href="{base}/program/empowerment" data-sveltekit-reload class="hover:text-blue-400 transition-colors">Empowerment</a></li>
+                    <li><a href="{base}/program/character-building" data-sveltekit-reload class="hover:text-blue-400 transition-colors">Character Building</a></li>
+                    <li><a href="{base}/program/community-engagement" data-sveltekit-reload class="hover:text-blue-400 transition-colors">Community Engagement</a></li>
+                    <li><a href="{base}/program/future-leadership" data-sveltekit-reload class="hover:text-blue-400 transition-colors">Future Leadership</a></li>
                 </ul>
             </div>
             

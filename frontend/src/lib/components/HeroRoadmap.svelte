@@ -1,4 +1,5 @@
 <script>
+    import { base } from '$app/paths';
     import { heroData } from '$lib/data/roadmap';
 </script>
 
@@ -23,7 +24,7 @@
             <a href="#visi-lima-tahun" class="flex items-center justify-center rounded-full h-11 sm:h-12 px-6 sm:px-8 bg-white text-primary text-sm sm:text-base font-bold hover:bg-gray-50 transition-colors shadow-lg">
                 Pelajari Rencana Kami
             </a>
-            <a href="/berita" class="flex items-center justify-center rounded-full h-11 sm:h-12 px-6 sm:px-8 bg-transparent border-2 border-white text-white text-sm sm:text-base font-bold hover:bg-white/10 transition-colors">
+            <a href="{base}/berita" class="flex items-center justify-center rounded-full h-11 sm:h-12 px-6 sm:px-8 bg-transparent border-2 border-white text-white text-sm sm:text-base font-bold hover:bg-white/10 transition-colors">
                 Lihat Berita Kami
             </a>
         </div>

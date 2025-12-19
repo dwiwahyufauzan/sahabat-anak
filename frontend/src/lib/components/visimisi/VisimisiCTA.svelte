@@ -1,4 +1,6 @@
 <script>
+    import { base } from '$app/paths';
+    
     let donationAmount = $state(50000);
     let volunteerData = $state({
         name: '',
@@ -57,14 +59,14 @@
             
             <div class="relative z-10 flex flex-col sm:flex-row items-center justify-center gap-4">
                 <a 
-                    href="/donasi"
+                    href="{base}/donasi"
                     class="flex min-w-45 h-14 items-center justify-center rounded-full bg-orange-400 hover:bg-orange-600 text-white text-lg font-bold shadow-lg shadow-orange-500/25 transition-all transform hover:scale-105 active:scale-95"
                 >
                     Donasi Sekarang
                 </a>
                 
                 <a 
-                    href="/relawan"
+                    href="{base}/relawan"
                     class="flex min-w-45 h-14 items-center justify-center rounded-full bg-white border-2 border-gray-900 text-gray-900 font-bold hover:border-orange-400 hover:text-orange-400 transition-colors"
                 >
                     Daftar Relawan
