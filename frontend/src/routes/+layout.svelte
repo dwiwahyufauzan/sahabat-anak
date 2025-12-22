@@ -1,11 +1,14 @@
 <script>
 	import "./app.css";
   import { onMount } from 'svelte';
-  import { navigating } from '$app/stores';
+  import { navigating, page } from '$app/stores';
   import Header from '$lib/components/Navigation.svelte';
   import Footer from '$lib/components/Footer.svelte';
   
   let pageVisible = false;
+  
+  // Check if current page is admin
+  $: isAdminPage = $page.url.pathname.startsWith('/admin');
   
   $: if ($navigating) {
     pageVisible = false;
@@ -21,16 +24,18 @@
 </script>
 
 <div class="flex flex-col min-h-screen">
-
-  <!-- Header -->
-  <Header />
+  {#if !isAdminPage}
+    <!-- Header -->
+    <Header />
+  {/if}
 
   <!-- Main content -->
-  <main class="flex-1 bg-background-light {pageVisible ? 'animate-fade-in' : 'opacity-0'}">
+  <main class="flex-1 {isAdminPage ? '' : 'bg-background-light'} {pageVisible ? 'animate-fade-in' : 'opacity-0'}">
     <slot />
   </main>
 
-  <!-- Footer -->
-  <Footer />
-
+  {#if !isAdminPage}
+    <!-- Footer -->
+    <Footer />
+  {/if}
 </div>

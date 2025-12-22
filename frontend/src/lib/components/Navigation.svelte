@@ -120,7 +120,7 @@
                 <a href="{base}/relawan" class="px-5 py-2.5 rounded-full border-2 border-primary text-blue-400 font-semibold text-[15px] hover:bg-primary/5 transition-all duration-200">
                     Gabung Relawan
                 </a>
-                <a href="/donasi" class="px-5 py-2.5 rounded-full bg-orange-400 text-white font-semibold text-[15px] shadow-md hover:shadow-lg hover:bg-orange-600 transition-all duration-200">
+                <a href="{base}/donasi" class="px-5 py-2.5 rounded-full bg-orange-400 text-white font-semibold text-[15px] shadow-md hover:shadow-lg hover:bg-orange-600 transition-all duration-200">
                     Donasi Sekarang
                 </a>
             </div>

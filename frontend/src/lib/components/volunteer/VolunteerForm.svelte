@@ -189,6 +189,65 @@
         {/if}
       </div>
 
+      <!-- Address Field -->
+      <div class="flex flex-col gap-2">
+        <label class="text-sky-900 text-sm font-bold ml-4" for="address">Alamat Lengkap</label>
+        <div class="relative group">
+          <div class="absolute top-4 left-0 pl-5 flex items-start pointer-events-none text-sky-400 group-focus-within:text-primary transition-colors">
+            <span class="material-symbols-outlined text-[24px]">home</span>
+          </div>
+          <textarea 
+            bind:value={$formData.address}
+            class="w-full min-h-25 rounded-3xl bg-sky-50/50 border-2 border-sky-100 text-sky-900 pl-14 pr-6 pt-4 pb-4 focus:ring-4 focus:ring-primary/20 focus:border-primary placeholder-sky-300 font-semibold transition-all resize-none" 
+            id="address" 
+            placeholder="Jl. Contoh No. 123, Kelurahan, Kecamatan, Kota"
+            rows="3"
+          ></textarea>
+        </div>
+      </div>
+
+      <!-- Motivation Field -->
+      <div class="flex flex-col gap-2">
+        <label class="text-sky-900 text-sm font-bold ml-4" for="motivation">Motivasi Bergabung</label>
+        <div class="relative group">
+          <div class="absolute top-4 left-0 pl-5 flex items-start pointer-events-none text-sky-400 group-focus-within:text-primary transition-colors">
+            <span class="material-symbols-outlined text-[24px]">favorite</span>
+          </div>
+          <textarea 
+            bind:value={$formData.motivation}
+            class="w-full min-h-30 rounded-3xl bg-sky-50/50 border-2 border-sky-100 text-sky-900 pl-14 pr-6 pt-4 pb-4 focus:ring-4 focus:ring-primary/20 focus:border-primary placeholder-sky-300 font-semibold transition-all resize-none" 
+            id="motivation" 
+            placeholder="Ceritakan alasan Anda ingin menjadi relawan..."
+            rows="4"
+          ></textarea>
+        </div>
+      </div>
+
+      <!-- Availability Field -->
+      <div class="flex flex-col gap-2">
+        <label class="text-sky-900 text-sm font-bold ml-4" for="availability">Ketersediaan Waktu</label>
+        <div class="relative group">
+          <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none text-sky-400 group-focus-within:text-primary transition-colors z-10">
+            <span class="material-symbols-outlined text-[24px]">schedule</span>
+          </div>
+          <select 
+            bind:value={$formData.availability}
+            class="w-full h-16 rounded-3xl bg-sky-50/50 border-2 border-sky-100 text-sky-900 pl-14 pr-12 focus:ring-4 focus:ring-primary/20 focus:border-primary hover:border-primary/50 font-semibold transition-all appearance-none cursor-pointer relative z-0"
+            class:text-sky-400={!$formData.availability}
+            id="availability"
+          >
+            <option value="" disabled class="text-sky-400">Pilih ketersediaan waktu</option>
+            <option value="Weekdays (Senin-Jumat)" class="text-sky-900 font-semibold">Weekdays (Senin-Jumat)</option>
+            <option value="Weekends (Sabtu-Minggu)" class="text-sky-900 font-semibold">Weekends (Sabtu-Minggu)</option>
+            <option value="Fleksibel" class="text-sky-900 font-semibold">Fleksibel</option>
+            <option value="Hanya event tertentu" class="text-sky-900 font-semibold">Hanya event tertentu</option>
+          </select>
+          <div class="absolute inset-y-0 right-0 pr-6 flex items-center pointer-events-none text-sky-400 group-focus-within:text-primary transition-colors z-10">
+            <span class="material-symbols-outlined group-focus-within:rotate-180 transition-transform duration-300">expand_more</span>
+          </div>
+        </div>
+      </div>
+
       <!-- Submit Button -->
       <div class="pt-6">
         <button 
