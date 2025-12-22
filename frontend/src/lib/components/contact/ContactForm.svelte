@@ -1,4 +1,6 @@
 <script>
+    import { api } from '$lib/api/client';
+    
     let formData = {
         name: '',
         email: '',
@@ -7,19 +9,31 @@
     };
     
     let isSubmitting = false;
+    let error = '';
     
     async function handleSubmit() {
         isSubmitting = true;
+        error = '';
         
-        // Simulasi pengiriman form
-        await new Promise(resolve => setTimeout(resolve, 1500));
-        
-        console.log('Form submitted:', formData);
-        alert('Pesan Anda telah terkirim! Kami akan segera menghubungi Anda.');
-        
-        // Reset form
-        formData = { name: '', email: '', subject: '', message: '' };
-        isSubmitting = false;
+        try {
+            await api.createContact({
+                name: formData.name,
+                email: formData.email,
+                subject: formData.subject,
+                message: formData.message
+            });
+            
+            alert('Pesan Anda telah terkirim! Kami akan segera menghubungi Anda.');
+            
+            // Reset form
+            formData = { name: '', email: '', subject: '', message: '' };
+        } catch (err) {
+            console.error('Error submitting contact form:', err);
+            error = err instanceof Error ? err.message : 'Terjadi kesalahan saat mengirim pesan. Silakan coba lagi.';
+            alert(error);
+        } finally {
+            isSubmitting = false;
+        }
     }
 </script>
 
@@ -34,7 +48,7 @@
         </p>
     </div>
     
-    <form on:submit|preventDefault={handleSubmit} class="flex flex-col gap-6">
+    <form onsubmit={(e) => { e.preventDefault(); handleSubmit(); }} class="flex flex-col gap-6">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <!-- Nama Lengkap -->
             <label class="flex flex-col gap-2">

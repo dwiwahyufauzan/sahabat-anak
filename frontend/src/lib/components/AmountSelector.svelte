@@ -60,7 +60,7 @@
     {#each presetAmounts as preset, i (preset.amount)}
       <button
         type="button"
-        on:click={() => selectAmount(preset.amount)}
+        onclick={() => selectAmount(preset.amount)}
         class="
           group relative h-24 px-4 py-4 rounded-2xl border-2
           flex flex-col justify-between text-left font-bold
@@ -106,8 +106,8 @@
       inputmode="numeric"
       pattern="[0-9]*"
       bind:value={$customAmount}
-      on:input={handleCustomInput}
-      on:blur={handleCustomBlur}
+      oninput={handleCustomInput}
+      onblur={handleCustomBlur}
       placeholder="Masukkan nominal lainnya..."
       class="
         w-full pl-12 pr-4 py-4 rounded-2xl

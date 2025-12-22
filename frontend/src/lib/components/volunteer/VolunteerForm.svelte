@@ -1,6 +1,7 @@
 <script>
   import { formData, formErrors, isSubmitting, resetForm } from '$lib/stores/volunteerForm';
   import { volunteerCategories } from '$lib/data/volunteer';
+  import { api } from '$lib/api/client';
 
   /**
    * @param {string} email
@@ -62,14 +63,24 @@
     $isSubmitting = true;
     
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Submit to backend API
+      await api.createVolunteer({
+        name: $formData.name,
+        email: $formData.email,
+        phone: $formData.phone,
+        address: $formData.address || '',
+        skills: $formData.category || '',
+        motivation: $formData.motivation || '',
+        availability: $formData.availability || ''
+      });
       
       alert(`Terima kasih ${$formData.name}! Pendaftaran Anda telah diterima. Kami akan menghubungi Anda melalui email di ${$formData.email}`);
       
       resetForm();
     } catch (error) {
-      alert('Terjadi kesalahan. Silakan coba lagi.');
+      const message = error instanceof Error ? error.message : 'Silakan coba lagi.';
+      alert(`Terjadi kesalahan: ${message}`);
+      console.error('Failed to submit volunteer form:', error);
     } finally {
       $isSubmitting = false;
     }
@@ -87,7 +98,7 @@
     <div class="absolute -top-6 -right-6 w-20 h-20 bg-primary/20 rounded-full blur-xl -z-10"></div>
     <div class="absolute -bottom-6 -left-6 w-24 h-24 bg-secondary/20 rounded-full blur-xl -z-10"></div>
 
-    <form on:submit|preventDefault={handleSubmit} class="grid grid-cols-1 gap-8">
+    <form onsubmit={(e) => { e.preventDefault(); handleSubmit(); }} class="grid grid-cols-1 gap-8">
       <!-- Name Field -->
       <div class="flex flex-col gap-2">
         <label class="text-sky-900 text-sm font-bold ml-4" for="name">Nama Lengkap</label>

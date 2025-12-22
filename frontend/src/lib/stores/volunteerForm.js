@@ -4,7 +4,10 @@ export const formData = writable({
   name: '',
   email: '',
   phone: '',
-  category: ''
+  category: '',
+  address: '',
+  motivation: '',
+  availability: ''
 });
 
 export const formErrors = writable({
@@ -21,7 +24,10 @@ export function resetForm() {
     name: '',
     email: '',
     phone: '',
-    category: ''
+    category: '',
+    address: '',
+    motivation: '',
+    availability: ''
   });
   formErrors.set({
     name: '',
