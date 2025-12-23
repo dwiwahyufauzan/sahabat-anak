@@ -39,7 +39,7 @@
 <div class="min-h-screen bg-linear-to-br from-green-50 to-blue-50 flex items-center justify-center p-4">
   <div class="bg-white rounded-2xl shadow-xl w-full max-w-md p-8">
     <div class="text-center mb-8">
-      <h1 class="text-3xl font-bold text-primary mb-2">Sahabat Anak</h1>
+      <h1 class="text-3xl font-bold text-green-800 mb-2">Sahabat Anak</h1>
       <p class="text-gray-600">Admin Panel Login</p>
     </div>
 
@@ -81,14 +81,14 @@
       <button
         type="submit"
         disabled={loading}
-        class="w-full bg-primary hover:bg-blue-600 disabled:bg-gray-400 text-white font-semibold py-3 rounded-lg transition-colors"
+        class="w-full bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white font-semibold py-3 rounded-lg transition-colors"
       >
         {loading ? 'Loading...' : 'Login'}
       </button>
     </form>
 
     <div class="mt-6 text-center space-y-2">
-      <a href="/admin/register" class="text-primary hover:text-blue-600 text-sm block">
+      <a href="/admin/register" class="text-green-600 hover:text-green-700 text-sm block">
         Belum punya akun? Register
       </a>
       <a href="/" class="text-gray-500 hover:text-gray-700 text-sm block">

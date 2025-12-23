@@ -65,41 +65,48 @@ export const adminApi = {
     }
   },
 
-  // News
-  news: {
-    getAll: async () => {
-      const response = await fetch(`${API_BASE}/admin/news`, {
-        headers: getAuthHeaders()
-      });
-      return handleResponse(response);
-    },
-    
-    create: async (data: any) => {
-      const response = await fetch(`${API_BASE}/admin/news`, {
-        method: 'POST',
-        headers: getAuthHeaders(),
-        body: JSON.stringify(data)
-      });
-      return handleResponse(response);
-    },
-    
-    update: async (id: number, data: any) => {
-      const response = await fetch(`${API_BASE}/admin/news/${id}`, {
-        method: 'PUT',
-        headers: getAuthHeaders(),
-        body: JSON.stringify(data)
-      });
-      return handleResponse(response);
-    },
-    
-    delete: async (id: number) => {
-      const response = await fetch(`${API_BASE}/admin/news/${id}`, {
-        method: 'DELETE',
-        headers: getAuthHeaders()
-      });
-      return handleResponse(response);
-    }
+// News
+news: {
+  getAll: async () => {
+    const response = await fetch(`${API_BASE}/admin/news`, {
+      headers: getAuthHeaders()
+    });
+    return handleResponse(response);
   },
+  
+  getById: async (id: number) => {
+    const response = await fetch(`${API_BASE}/admin/news/${id}`, {
+      headers: getAuthHeaders()
+    });
+    return handleResponse(response);
+  },
+  
+  create: async (data: any) => {
+    const response = await fetch(`${API_BASE}/admin/news`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(data)
+    });
+    return handleResponse(response);
+  },
+  
+  update: async (id: number, data: any) => {
+    const response = await fetch(`${API_BASE}/admin/news/${id}`, {
+      method: 'PUT',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(data)
+    });
+    return handleResponse(response);
+  },
+  
+  delete: async (id: number) => {
+    const response = await fetch(`${API_BASE}/admin/news/${id}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders()
+    });
+    return handleResponse(response);
+  }
+},
 
   // Donations
   donations: {
