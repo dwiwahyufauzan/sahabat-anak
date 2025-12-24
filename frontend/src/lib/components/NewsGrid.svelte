@@ -4,6 +4,7 @@
   import { activeCategory, searchQuery } from '$lib/stores/newsFilter';
   import { api } from '$lib/api/client';
   import NewsCard from './NewsCard.svelte';
+  import ComingSoon from './ComingSoon.svelte';
   
   /**
    * @type {any[]}
@@ -40,8 +41,11 @@
       <p class="text-gray-500 dark:text-gray-400 mt-4">Memuat berita...</p>
     </div>
   {:else if error}
-    <div class="col-span-full text-center py-12">
-      <p class="text-red-500">Error: {error}</p>
+    <div class="col-span-full">
+      <ComingSoon 
+        title="Berita & Kegiatan" 
+        message="Section ini sedang dalam pengembangan. Silakan coba lagi nanti." 
+      />
     </div>
   {:else if filteredNews.length > 0}
     {#each filteredNews as article (article.id)}

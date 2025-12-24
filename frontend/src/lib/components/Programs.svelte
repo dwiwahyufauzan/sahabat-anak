@@ -3,6 +3,7 @@
     import { onMount } from 'svelte';
     import { api } from '$lib/api/client';
     import { getImageUrl } from '$lib/utils/image';
+    import ComingSoon from './ComingSoon.svelte';
     
     let visible = $state(false);
     /**
@@ -63,8 +64,11 @@
                     <p class="text-gray-500 dark:text-gray-400 mt-4">Memuat program...</p>
                 </div>
             {:else if error}
-                <div class="col-span-full text-center py-12">
-                    <p class="text-red-500">Error: {error}</p>
+                <div class="col-span-full">
+                    <ComingSoon 
+                        title="Program Kami" 
+                        message="Section ini sedang dalam pengembangan. Silakan coba lagi nanti." 
+                    />
                 </div>
             {:else if programs.length === 0}
                 <div class="col-span-full text-center py-12">

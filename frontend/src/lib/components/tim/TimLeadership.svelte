@@ -2,17 +2,20 @@
     import { onMount } from 'svelte';
     import { api } from '$lib/api/client';
     import TeamCard from './TeamCard.svelte';
+    import ComingSoon from '../ComingSoon.svelte';
     
     let leadershipTeam: any[] = [];
     let loading = true;
+    let error = '';
     
     onMount(async () => {
         try {
             const allTeam = await api.getTeam() as any[];
             // Filter hanya leadership yang aktif
             leadershipTeam = allTeam.filter(member => member.teamType === 'leadership' && member.isActive === 1);
-        } catch (error) {
-            console.error('Failed to load leadership team:', error);
+        } catch (err) {
+            error = err instanceof Error ? err.message : 'Failed to load leadership team';
+            console.error('Failed to load leadership team:', err);
         } finally {
             loading = false;
         }
@@ -34,6 +37,11 @@
         <div class="flex justify-center items-center py-20">
             <div class="w-12 h-12 border-4 border-blue-400 border-t-transparent rounded-full animate-spin"></div>
         </div>
+    {:else if error}
+        <ComingSoon 
+            title="Pengurus Harian" 
+            message="Section ini sedang dalam pengembangan. Silakan coba lagi nanti." 
+        />
     {:else if leadershipTeam.length === 0}
         <div class="text-center py-20">
             <p class="text-gray-500">Tidak ada data leadership saat ini.</p>

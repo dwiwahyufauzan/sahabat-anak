@@ -1,18 +1,21 @@
 <script lang="ts">
     import { onMount } from 'svelte';
     import { api } from '$lib/api/client';
+    import ComingSoon from '../ComingSoon.svelte';
     
     let programCoordinators: any[] = $state([]);
     let visibleCards: number[] = $state([]);
     let loading = $state(true);
+    let error = $state('');
     
     onMount(async () => {
         try {
             const allTeam = await api.getTeam() as any[];
             // Filter hanya coordinator yang aktif
             programCoordinators = allTeam.filter(member => member.teamType === 'coordinators' && member.isActive === 1);
-        } catch (error) {
-            console.error('Failed to load coordinators:', error);
+        } catch (err) {
+            error = err instanceof Error ? err.message : 'Failed to load coordinators';
+            console.error('Failed to load coordinators:', err);
         } finally {
             loading = false;
         }
@@ -42,6 +45,11 @@
         <div class="flex justify-center items-center py-20">
             <div class="w-12 h-12 border-4 border-blue-400 border-t-transparent rounded-full animate-spin"></div>
         </div>
+    {:else if error}
+        <ComingSoon 
+            title="Koordinator Program" 
+            message="Section ini sedang dalam pengembangan. Silakan coba lagi nanti." 
+        />
     {:else if programCoordinators.length === 0}
         <div class="text-center py-20">
             <p class="text-gray-500">Tidak ada data koordinator program saat ini.</p>
