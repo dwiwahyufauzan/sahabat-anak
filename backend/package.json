@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "bun --watch src/index.ts",
+    "build": "echo 'No build step needed for Bun'",
     "start": "bun src/index.ts",
     "test": "bun test",
     "test:watch": "bun test --watch",
