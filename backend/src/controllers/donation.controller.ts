@@ -17,7 +17,23 @@ export class DonationController {
     message?: string;
   }) {
     const result = await db.insert(donations).values(data);
-    return { id: result[0].insertId };
+    const donationId = result[0].insertId;
+
+    // Send auto-reply thank you email
+    try {
+      await emailService.sendDonationThankYouEmail({
+        name: data.donorName,
+        email: data.donorEmail,
+        amount: data.amount,
+        programName: data.programId ? `Program #${data.programId}` : undefined,
+      });
+      console.log(`Auto-reply email sent to ${data.donorEmail}`);
+    } catch (error) {
+      console.error('Error sending donation auto-reply email:', error);
+      // Don't throw error, donation should still be created
+    }
+
+    return { id: donationId };
   }
 
   // Admin methods

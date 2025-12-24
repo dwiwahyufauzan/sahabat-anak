@@ -4,6 +4,7 @@ import { NewsController } from '../controllers/news.controller';
 import { DonationController } from '../controllers/donation.controller';
 import { VolunteerController } from '../controllers/volunteer.controller';
 import { ContactController } from '../controllers/contact.controller';
+import { TeamController } from '../controllers/team.controller';
 import { savePaymentProof } from '../utils/upload';
 
 export const publicRoutes = new Elysia({ prefix: '/api' })
@@ -31,6 +32,11 @@ export const publicRoutes = new Elysia({ prefix: '/api' })
       set.status = 404;
       return { error: error instanceof Error ? error.message : 'News not found' };
     }
+  })
+  
+  // Team routes (PUBLIC)
+  .get('/team', async () => {
+    return await TeamController.getAllActive();
   })
   
   // Donations routes

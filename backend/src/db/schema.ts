@@ -1,4 +1,4 @@
-import { mysqlTable, varchar, text, timestamp, int, decimal, mysqlEnum } from 'drizzle-orm/mysql-core';
+import { mysqlTable, varchar, text, timestamp, int, decimal, mysqlEnum, json } from 'drizzle-orm/mysql-core';
 
 // Admin table
 export const admins = mysqlTable('admins', {
@@ -19,12 +19,24 @@ export const programs = mysqlTable('programs', {
   id: int('id').primaryKey().autoincrement(),
   slug: varchar('slug', { length: 255 }).notNull().unique(),
   title: varchar('title', { length: 255 }).notNull(),
-  description: text('description').notNull(),
+  description: text('description').notNull(), // Short description
+  fullDescription: text('full_description'), // Long description for detail page
   category: varchar('category', { length: 100 }).notNull(),
-  image: varchar('image', { length: 255 }),
+  categoryColor: varchar('category_color', { length: 50 }).default('blue'), // blue, orange, green, purple
+  icon: varchar('icon', { length: 100 }).default('menu_book'), // Material icon name
+  image: varchar('image', { length: 255 }), // Thumbnail image
+  heroImage: varchar('hero_image', { length: 255 }), // Hero banner for detail page
   targetAmount: decimal('target_amount', { precision: 15, scale: 2 }),
   currentAmount: decimal('current_amount', { precision: 15, scale: 2 }).default('0'),
   location: varchar('location', { length: 255 }),
+  locations: text('locations'), // JSON array of locations
+  targetAudience: text('target_audience'), // Target audience description
+  scheduleFrequency: varchar('schedule_frequency', { length: 255 }), // e.g., "3x seminggu"
+  scheduleDuration: varchar('schedule_duration', { length: 255 }), // e.g., "2 jam per sesi"
+  objectives: text('objectives'), // JSON array of objectives
+  activities: text('activities'), // JSON array of activities
+  testimonials: text('testimonials'), // JSON array of testimonials
+  impact: text('impact'), // JSON array of impact stats
   status: mysqlEnum('status', ['active', 'completed', 'archived']).default('active'),
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow().onUpdateNow(),
@@ -83,6 +95,9 @@ export const contactMessages = mysqlTable('contact_messages', {
   subject: varchar('subject', { length: 255 }),
   message: text('message').notNull(),
   status: mysqlEnum('status', ['unread', 'read', 'replied']).default('unread'),
+  reply: text('reply'),
+  repliedAt: timestamp('replied_at'),
+  repliedBy: int('replied_by').references(() => admins.id),
   createdAt: timestamp('created_at').defaultNow(),
 });
 
@@ -91,8 +106,9 @@ export const teamMembers = mysqlTable('team_members', {
   id: int('id').primaryKey().autoincrement(),
   name: varchar('name', { length: 255 }).notNull(),
   role: varchar('role', { length: 100 }).notNull(),
-  image: varchar('image', { length: 255 }),
   bio: text('bio'),
+  photo: varchar('photo', { length: 255 }),
+  teamType: mysqlEnum('team_type', ['leadership', 'coordinators']).default('coordinators'),
   order: int('order').default(0),
   isActive: int('is_active').default(1),
   createdAt: timestamp('created_at').defaultNow(),

@@ -30,8 +30,9 @@ export class TeamController {
   static async create(data: {
     name: string;
     role: string;
-    image?: string;
     bio?: string;
+    photo?: string;
+    teamType?: 'leadership' | 'coordinators';
     order?: number;
     isActive?: number;
   }) {
@@ -42,8 +43,9 @@ export class TeamController {
   static async update(id: number, data: Partial<{
     name: string;
     role: string;
-    image: string;
     bio: string;
+    photo: string;
+    teamType: 'leadership' | 'coordinators';
     order: number;
     isActive: number;
   }>) {

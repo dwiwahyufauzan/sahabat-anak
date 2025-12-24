@@ -31,11 +31,23 @@ export const adminProgramRoutes = new Elysia({ prefix: '/api/admin/programs' })
         slug: t.String(),
         title: t.String(),
         description: t.String(),
+        fullDescription: t.Optional(t.String()),
         category: t.String(),
+        categoryColor: t.Optional(t.String()),
+        icon: t.Optional(t.String()),
         image: t.Optional(t.String()),
+        heroImage: t.Optional(t.String()),
         targetAmount: t.Optional(t.String()),
         currentAmount: t.Optional(t.String()),
         location: t.Optional(t.String()),
+        locations: t.Optional(t.String()), // JSON string
+        targetAudience: t.Optional(t.String()),
+        scheduleFrequency: t.Optional(t.String()),
+        scheduleDuration: t.Optional(t.String()),
+        objectives: t.Optional(t.String()), // JSON string
+        activities: t.Optional(t.String()), // JSON string
+        impact: t.Optional(t.String()), // JSON string
+        testimonials: t.Optional(t.String()), // JSON string
         status: t.Optional(t.Union([t.Literal('active'), t.Literal('completed'), t.Literal('archived')])),
       }),
     }
@@ -56,11 +68,23 @@ export const adminProgramRoutes = new Elysia({ prefix: '/api/admin/programs' })
           slug: t.String(),
           title: t.String(),
           description: t.String(),
+          fullDescription: t.String(),
           category: t.String(),
+          categoryColor: t.String(),
+          icon: t.String(),
           image: t.String(),
+          heroImage: t.String(),
           targetAmount: t.String(),
           currentAmount: t.String(),
           location: t.String(),
+          locations: t.String(),
+          targetAudience: t.String(),
+          scheduleFrequency: t.String(),
+          scheduleDuration: t.String(),
+          objectives: t.String(),
+          activities: t.String(),
+          impact: t.String(),
+          testimonials: t.String(),
           status: t.Union([t.Literal('active'), t.Literal('completed'), t.Literal('archived')]),
         })
       ),

@@ -10,6 +10,7 @@ import { adminDonationRoutes } from './routes/admin/donations';
 import { adminVolunteerRoutes } from './routes/admin/volunteers';
 import { adminContactRoutes } from './routes/admin/contacts';
 import { adminTeamRoutes } from './routes/admin/team';
+import { uploadRoutes } from './routes/admin/upload';
 
 const app = new Elysia()
   .use(
@@ -45,6 +46,7 @@ const app = new Elysia()
   .get('/', () => ({ message: 'Sahabat Anak API is running' }))
   .use(authRoutes)
   .use(publicRoutes)
+  .use(uploadRoutes)
   .use(adminProgramRoutes)
   .use(adminNewsRoutes)
   .use(adminDonationRoutes)

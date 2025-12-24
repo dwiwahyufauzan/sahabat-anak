@@ -19,7 +19,7 @@ describe('Team Members Tests', () => {
       name: 'Test Member',
       role: 'Developer',
       bio: 'Test bio',
-      image: 'https://example.com/image.jpg',
+      photo: 'https://example.com/photo.jpg',
       order: 1
     };
 
@@ -37,14 +37,14 @@ describe('Team Members Tests', () => {
 
   test('TeamController.getById - should return team member by id', async () => {
     // Create test member
-    const [result] = await db.insert(teamMembers).values({
+    const [inserted] = await db.insert(teamMembers).values({
       name: 'Get Test Member',
       role: 'Tester',
       bio: 'Test bio',
       order: 1
-    });
+    }).$returningId();
 
-    const memberId = result.insertId;
+    const memberId = inserted.id;
     const member = await TeamController.getById(memberId);
     
     expect(member).toBeDefined();
@@ -60,14 +60,14 @@ describe('Team Members Tests', () => {
 
   test('TeamController.update - should update team member', async () => {
     // Create test member
-    const [result] = await db.insert(teamMembers).values({
+    const [inserted] = await db.insert(teamMembers).values({
       name: 'Update Test',
       role: 'Original Role',
       bio: 'Original bio',
       order: 1
-    });
+    }).$returningId();
 
-    const memberId = result.insertId;
+    const memberId = inserted.id;
     
     await TeamController.update(memberId, {
       role: 'Updated Role',
@@ -85,13 +85,13 @@ describe('Team Members Tests', () => {
 
   test('TeamController.delete - should delete team member', async () => {
     // Create test member
-    const [result] = await db.insert(teamMembers).values({
+    const [inserted] = await db.insert(teamMembers).values({
       name: 'Delete Test',
       role: 'To Be Deleted',
       order: 1
-    });
+    }).$returningId();
 
-    const memberId = result.insertId;
+    const memberId = inserted.id;
     
     await TeamController.delete(memberId);
     
@@ -100,13 +100,13 @@ describe('Team Members Tests', () => {
   });
 
   test('Team member should have default active status', async () => {
-    const [result] = await db.insert(teamMembers).values({
+    const [inserted] = await db.insert(teamMembers).values({
       name: 'Status Test',
       role: 'Tester',
       order: 1
-    });
+    }).$returningId();
 
-    const memberId = result.insertId;
+    const memberId = inserted.id;
     const [member] = await db.select().from(teamMembers).where(eq(teamMembers.id, memberId));
     
     expect(member.isActive).toBe(1);
@@ -116,13 +116,13 @@ describe('Team Members Tests', () => {
   });
 
   test('Team member order should be settable', async () => {
-    const [result] = await db.insert(teamMembers).values({
+    const [inserted] = await db.insert(teamMembers).values({
       name: 'Order Test',
       role: 'Tester',
       order: 5
-    });
+    }).$returningId();
 
-    const memberId = result.insertId;
+    const memberId = inserted.id;
     const [member] = await db.select().from(teamMembers).where(eq(teamMembers.id, memberId));
     
     expect(member.order).toBe(5);

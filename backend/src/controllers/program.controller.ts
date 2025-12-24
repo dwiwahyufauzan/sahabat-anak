@@ -15,7 +15,15 @@ export class ProgramController {
       throw new Error('Program not found');
     }
     
-    return program;
+    // Parse JSON fields
+    return {
+      ...program,
+      locations: program.locations ? JSON.parse(program.locations) : [],
+      objectives: program.objectives ? JSON.parse(program.objectives) : [],
+      activities: program.activities ? JSON.parse(program.activities) : [],
+      impact: program.impact ? JSON.parse(program.impact) : [],
+      testimonials: program.testimonials ? JSON.parse(program.testimonials) : []
+    };
   }
 
   // Admin methods
@@ -30,7 +38,15 @@ export class ProgramController {
       throw new Error('Program not found');
     }
     
-    return program;
+    // Parse JSON fields for admin editing
+    return {
+      ...program,
+      locations: program.locations ? JSON.parse(program.locations) : [],
+      objectives: program.objectives ? JSON.parse(program.objectives) : [],
+      activities: program.activities ? JSON.parse(program.activities) : [],
+      impact: program.impact ? JSON.parse(program.impact) : [],
+      testimonials: program.testimonials ? JSON.parse(program.testimonials) : []
+    };
   }
 
   static async create(data: {

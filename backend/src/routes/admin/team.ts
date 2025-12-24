@@ -30,8 +30,9 @@ export const adminTeamRoutes = new Elysia({ prefix: '/api/admin/team' })
       body: t.Object({
         name: t.String(),
         role: t.String(),
-        image: t.Optional(t.String()),
         bio: t.Optional(t.String()),
+        photo: t.Optional(t.String()),
+        teamType: t.Optional(t.Union([t.Literal('leadership'), t.Literal('coordinators')])),
         order: t.Optional(t.Number()),
         isActive: t.Optional(t.Number()),
       }),
@@ -52,8 +53,9 @@ export const adminTeamRoutes = new Elysia({ prefix: '/api/admin/team' })
         t.Object({
           name: t.String(),
           role: t.String(),
-          image: t.String(),
           bio: t.String(),
+          photo: t.String(),
+          teamType: t.Union([t.Literal('leadership'), t.Literal('coordinators')]),
           order: t.Number(),
           isActive: t.Number(),
         })
