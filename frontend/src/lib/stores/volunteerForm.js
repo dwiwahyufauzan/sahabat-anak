@@ -5,6 +5,7 @@ export const formData = writable({
   email: '',
   phone: '',
   category: '',
+  skills: '',
   address: '',
   motivation: '',
   availability: ''
@@ -25,6 +26,7 @@ export function resetForm() {
     email: '',
     phone: '',
     category: '',
+    skills: '',
     address: '',
     motivation: '',
     availability: ''

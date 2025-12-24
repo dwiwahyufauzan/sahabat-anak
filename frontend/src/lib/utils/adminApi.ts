@@ -31,39 +31,46 @@ async function handleResponse(response: Response) {
 export const adminApi = {
   // Programs
   programs: {
-    getAll: async () => {
-      const response = await fetch(`${API_BASE}/admin/programs`, {
-        headers: getAuthHeaders()
-      });
-      return handleResponse(response);
-    },
-    
-    create: async (data: any) => {
-      const response = await fetch(`${API_BASE}/admin/programs`, {
-        method: 'POST',
-        headers: getAuthHeaders(),
-        body: JSON.stringify(data)
-      });
-      return handleResponse(response);
-    },
-    
-    update: async (id: number, data: any) => {
-      const response = await fetch(`${API_BASE}/admin/programs/${id}`, {
-        method: 'PUT',
-        headers: getAuthHeaders(),
-        body: JSON.stringify(data)
-      });
-      return handleResponse(response);
-    },
-    
-    delete: async (id: number) => {
-      const response = await fetch(`${API_BASE}/admin/programs/${id}`, {
-        method: 'DELETE',
-        headers: getAuthHeaders()
-      });
-      return handleResponse(response);
-    }
+  getAll: async () => {
+    const response = await fetch(`${API_BASE}/admin/programs`, {
+      headers: getAuthHeaders()
+    });
+    return handleResponse(response);
   },
+  
+  getById: async (id: number) => {
+    const response = await fetch(`${API_BASE}/admin/programs/${id}`, {
+      headers: getAuthHeaders()
+    });
+    return handleResponse(response);
+  },
+  
+  create: async (data: any) => {
+    const response = await fetch(`${API_BASE}/admin/programs`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(data)
+    });
+    return handleResponse(response);
+  },
+  
+  update: async (id: number, data: any) => {
+    const response = await fetch(`${API_BASE}/admin/programs/${id}`, {
+      method: 'PUT',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(data)
+    });
+    return handleResponse(response);
+  },
+  
+  delete: async (id: number) => {
+    const response = await fetch(`${API_BASE}/admin/programs/${id}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders()
+    });
+    return handleResponse(response);
+  }
+},
 
 // News
 news: {
@@ -151,6 +158,14 @@ news: {
         body: JSON.stringify({ status })
       });
       return handleResponse(response);
+    },
+    
+    delete: async (id: number) => {
+      const response = await fetch(`${API_BASE}/admin/volunteers/${id}`, {
+        method: 'DELETE',
+        headers: getAuthHeaders()
+      });
+      return handleResponse(response);
     }
   },
 
@@ -163,11 +178,28 @@ news: {
       return handleResponse(response);
     },
     
-    markAsRead: async (id: number) => {
+    updateStatus: async (id: number, status: string) => {
       const response = await fetch(`${API_BASE}/admin/contacts/${id}/status`, {
         method: 'PUT',
         headers: getAuthHeaders(),
-        body: JSON.stringify({ status: 'read' })
+        body: JSON.stringify({ status })
+      });
+      return handleResponse(response);
+    },
+
+    sendReply: async (id: number, reply: string) => {
+      const response = await fetch(`${API_BASE}/admin/contacts/${id}/reply`, {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ reply })
+      });
+      return handleResponse(response);
+    },
+
+    delete: async (id: number) => {
+      const response = await fetch(`${API_BASE}/admin/contacts/${id}`, {
+        method: 'DELETE',
+        headers: getAuthHeaders()
       });
       return handleResponse(response);
     }

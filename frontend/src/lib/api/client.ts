@@ -234,6 +234,21 @@ class ApiClient {
     });
   }
 
+  async sendContactReply(id: number, reply: string, token: string) {
+    return this.request(`/api/admin/contacts/${id}/reply`, {
+      method: 'POST',
+      body: JSON.stringify({ reply }),
+      token,
+    });
+  }
+
+  async deleteContact(id: number, token: string) {
+    return this.request(`/api/admin/contacts/${id}`, {
+      method: 'DELETE',
+      token,
+    });
+  }
+
   // Admin - Team
   async getAdminTeam(token: string) {
     return this.request('/api/admin/team', { token });
@@ -260,6 +275,11 @@ class ApiClient {
       method: 'DELETE',
       token,
     });
+  }
+
+  // Team (Public)
+  async getTeam() {
+    return this.request('/api/team');
   }
 }
 

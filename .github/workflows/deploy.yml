@@ -21,21 +21,19 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
         with:
-          node-version: '20'
+          bun-version: latest
 
       - name: Install dependencies
-        run: |
-          cd frontend
-          rm -f package-lock.json
-          npm install
+        working-directory: ./frontend
+        run: bun install
 
       - name: Build
+        working-directory: ./frontend
         run: |
-          cd frontend
-          npm run build
+          bun run build
           touch build/.nojekyll
 
       - name: Upload artifact

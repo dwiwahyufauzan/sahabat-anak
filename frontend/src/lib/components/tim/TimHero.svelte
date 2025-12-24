@@ -69,7 +69,7 @@
                     <div class="absolute inset-0 bg-linear-to-t from-black/60 to-transparent flex items-end p-8">
                         <div class="text-white">
                             <p class="font-bold text-lg">Sahabat Anak Family</p>
-                            <p class="text-sm opacity-80">Jakarta, 2023</p>
+                            <p class="text-sm opacity-80">Subang, 2023</p>
                         </div>
                     </div>
                 </div>

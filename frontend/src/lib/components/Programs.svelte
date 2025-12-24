@@ -2,6 +2,7 @@
     import { base } from '$app/paths';
     import { onMount } from 'svelte';
     import { api } from '$lib/api/client';
+    import { getImageUrl } from '$lib/utils/image';
     
     let visible = $state(false);
     /**
@@ -74,9 +75,12 @@
                     <div class="group bg-white dark:bg-gray-800 rounded-4xl border border-gray-100 dark:border-gray-700 overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1 {visible ? 'animate-scale-in' : 'opacity-0'}" style="animation-delay: {index * 0.1}s;">
                         <div class="h-64 overflow-hidden relative">
                             <div class="absolute inset-0 bg-linear-to-t from-black/50 to-transparent z-10"></div>
-                            <img src={program.image || 'https://via.placeholder.com/400x300'} 
-                                 alt={program.title} 
-                                 class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                            <img 
+                                src={getImageUrl(program.image)} 
+                                alt={program.title} 
+                                class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                                onerror={(e) => { if (e.target instanceof HTMLImageElement) e.target.src = 'https://placehold.co/400x300?text=No+Image'; }}
+                            />
                             <div class="absolute top-4 right-4 z-20 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold text-blue-500">
                                 {program.category}
                             </div>

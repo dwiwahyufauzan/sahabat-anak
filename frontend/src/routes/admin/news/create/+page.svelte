@@ -4,6 +4,7 @@
 
   let formData = {
     title: '',
+    slug: '',
     excerpt: '',
     content: '',
     image: '',
@@ -13,18 +14,58 @@
 
   let isSubmitting = false;
 
+  // Generate slug from title
+  const generateSlug = () => {
+    if (!formData.title) return;
+    
+    formData.slug = formData.title
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-+|-+$/g, '');
+  };
+
   const handleSubmit = async () => {
     if (!formData.title || !formData.content) {
       alert('Judul dan konten wajib diisi');
       return;
     }
 
+    // Generate slug if not manually set
+    if (!formData.slug) {
+      generateSlug();
+    }
+
     isSubmitting = true;
     try {
-      await adminApi.news.create(formData);
+      // Prepare data - convert empty strings to undefined for optional fields
+      const submitData: any = {
+        slug: formData.slug,
+        title: formData.title,
+        content: formData.content,
+      };
+
+      // Add optional fields only if they have values
+      if (formData.excerpt && formData.excerpt.trim()) {
+        submitData.excerpt = formData.excerpt;
+      }
+      if (formData.image && formData.image.trim()) {
+        submitData.image = formData.image;
+      }
+      if (formData.category && formData.category.trim()) {
+        submitData.category = formData.category;
+      }
+      if (formData.author && formData.author.trim()) {
+        submitData.author = formData.author;
+      }
+
+      await adminApi.news.create(submitData);
       alert('Berita berhasil dibuat!');
       goto('/admin/news');
     } catch (error) {
+      console.error('Error:', error);
       alert('Gagal membuat berita: ' + (error instanceof Error ? error.message : 'Unknown error'));
     } finally {
       isSubmitting = false;
@@ -54,12 +95,29 @@
         </label>
         <input
           bind:value={formData.title}
+          oninput={generateSlug}
           type="text"
           id="title"
           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
           placeholder="Masukkan judul berita"
           required
         />
+      </div>
+
+      <!-- Slug -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2" for="slug">
+          Slug (URL) *
+        </label>
+        <input
+          bind:value={formData.slug}
+          type="text"
+          id="slug"
+          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+          placeholder="judul-berita-otomatis"
+          required
+        />
+        <p class="text-sm text-gray-500 mt-1">URL: /berita/{formData.slug}</p>
       </div>
 
       <!-- Excerpt -->

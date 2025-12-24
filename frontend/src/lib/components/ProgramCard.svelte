@@ -1,6 +1,7 @@
 <script lang="ts">
   import { base } from '$app/paths';
   import type { Program } from '$lib/types/program';
+  import { getImageUrl } from '$lib/utils/image';
   
   export let program: Program;
   
@@ -22,7 +23,7 @@
         <div class="absolute inset-0 bg-primary/20 z-10 opacity-0 group-hover:opacity-10 transition-opacity"></div>
         <div 
             class="w-full h-full bg-cover bg-center transition-transform duration-500 group-hover:scale-110"
-            style="background-image: url('{program.image}');"
+            style="background-image: url('{getImageUrl(program.image)}');"
             role="img"
             aria-label={program.alt}>
         </div>

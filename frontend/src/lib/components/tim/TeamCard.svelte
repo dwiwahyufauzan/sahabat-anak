@@ -23,20 +23,19 @@
 >
     <!-- Avatar -->
     <div class="relative mb-6">
-        <div class="w-32 h-32 rounded-full overflow-hidden border-4 border-background-light dark:border-slate-700 shadow-md group-hover:border-blue-400 transition-colors duration-300">
-            <img 
-                alt={member.alt}
-                class="w-full h-full object-cover transition-transform duration-500 {isHovered ? 'scale-110' : 'scale-100'}"
-                src={member.photo}
-            />
+        <div class="w-48 h-48 rounded-full overflow-hidden border-4 border-background-light dark:border-slate-700 shadow-md group-hover:border-blue-400 transition-colors duration-300">
+            {#if member.photo}
+                <img 
+                    alt={member.name}
+                    class="w-full h-full object-cover transition-transform duration-500 {isHovered ? 'scale-110' : 'scale-100'}"
+                    src="http://localhost:3000/uploads/team/{member.photo}"
+                />
+            {:else}
+                <div class="w-full h-full flex items-center justify-center bg-linear-to-br from-blue-400 to-blue-600">
+                    <span class="text-6xl text-white font-bold">{member.name.charAt(0)}</span>
+                </div>
+            {/if}
         </div>
-        
-        <!-- Verified badge for leadership -->
-        {#if type === 'leadership' && member.verified}
-            <div class="absolute bottom-0 right-0 bg-blue-400 text-white p-1.5 rounded-full shadow-lg">
-                <span class="material-symbols-outlined text-[18px] block">verified</span>
-            </div>
-        {/if}
         
         <!-- Hover overlay -->
         <div class="absolute inset-0 rounded-full bg-blue-400/0 group-hover:bg-blue-400/10 transition-colors duration-300"></div>
@@ -48,13 +47,15 @@
     </h3>
     
     <p class="text-blue-400 font-semibold text-sm mb-4">
-        {member.position}
+        {member.role}
     </p>
     
-    <!-- Quote -->
-    <p class="text-slate-500 dark:text-slate-400 text-sm italic leading-relaxed mb-6">
-        "{member.quote}"
-    </p>
+    <!-- Bio -->
+    {#if member.bio}
+        <p class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed mb-6 line-clamp-4">
+            {member.bio}
+        </p>
+    {/if}
 </div>
 
 

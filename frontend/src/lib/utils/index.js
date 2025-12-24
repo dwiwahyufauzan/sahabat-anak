@@ -23,8 +23,8 @@ export function animateValue(element, start, end, duration) {
 }
 
 // Format currency Indonesia
-/**kfidfnjndfudfnff
- * @param {string | number | bigint} amount
+/**cw
+ * @param {string | number | bigint} amount\
  */
 export function formatIDR(amount) {
     const numericAmount = typeof amount === 'string' ? Number(amount) : amount;

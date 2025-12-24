@@ -1,6 +1,22 @@
-<script>
-    import { leadershipTeam } from '$lib/utils/teamData.js';
+<script lang="ts">
+    import { onMount } from 'svelte';
+    import { api } from '$lib/api/client';
     import TeamCard from './TeamCard.svelte';
+    
+    let leadershipTeam: any[] = [];
+    let loading = true;
+    
+    onMount(async () => {
+        try {
+            const allTeam = await api.getTeam() as any[];
+            // Filter hanya leadership yang aktif
+            leadershipTeam = allTeam.filter(member => member.teamType === 'leadership' && member.isActive === 1);
+        } catch (error) {
+            console.error('Failed to load leadership team:', error);
+        } finally {
+            loading = false;
+        }
+    });
 </script>
 
 <section id="leadership">
@@ -14,13 +30,23 @@
         <div class="h-1.5 w-24 bg-blue-400 rounded-full mt-4"></div>
     </div>
     
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-        {#each leadershipTeam as member, index}
-            <TeamCard 
-                {member}
-                index={index}
-                type="leadership"
-            />
-        {/each}
-    </div>
+    {#if loading}
+        <div class="flex justify-center items-center py-20">
+            <div class="w-12 h-12 border-4 border-blue-400 border-t-transparent rounded-full animate-spin"></div>
+        </div>
+    {:else if leadershipTeam.length === 0}
+        <div class="text-center py-20">
+            <p class="text-gray-500">Tidak ada data leadership saat ini.</p>
+        </div>
+    {:else}
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            {#each leadershipTeam as member, index}
+                <TeamCard 
+                    {member}
+                    index={index}
+                    type="leadership"
+                />
+            {/each}
+        </div>
+    {/if}
 </section>

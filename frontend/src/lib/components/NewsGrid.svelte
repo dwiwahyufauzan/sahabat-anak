@@ -5,6 +5,9 @@
   import { api } from '$lib/api/client';
   import NewsCard from './NewsCard.svelte';
   
+  /**
+   * @type {any[]}
+   */
   let newsArticles = $state([]);
   let loading = $state(true);
   let error = $state('');

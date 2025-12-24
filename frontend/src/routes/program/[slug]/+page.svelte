@@ -1,10 +1,14 @@
 <script lang="ts">
   import { base } from '$app/paths';
   import { page } from '$app/stores';
-  import { getProgramBySlug } from '$lib/data/programs';
+  import { onMount } from 'svelte';
+  import { getImageUrl } from '$lib/utils/image';
   
   const slug = $page.params.slug || '';
-  const program = getProgramBySlug(slug);
+  
+  let program: any = null;
+  let loading = true;
+  let error = '';
   
   const categoryColors = {
     blue: { bg: 'bg-blue-500', text: 'text-blue-600', light: 'bg-blue-50' },
@@ -14,13 +18,71 @@
   };
   
   const getColorClasses = (color: string) => categoryColors[color as keyof typeof categoryColors] || categoryColors.blue;
+  
+  // Helper function to safely parse JSON fields
+  function safeJsonParse(value: any): any[] {
+    if (!value) return [];
+    if (Array.isArray(value)) return value;
+    if (typeof value === 'string') {
+      try {
+        const parsed = JSON.parse(value);
+        return Array.isArray(parsed) ? parsed : [];
+      } catch {
+        return [];
+      }
+    }
+    return [];
+  }
+  
+  onMount(async () => {
+    try {
+      const response = await fetch(`http://localhost:3000/api/programs/${slug}`);
+      if (!response.ok) {
+        throw new Error('Program tidak ditemukan');
+      }
+      const data = await response.json();
+      
+      // Parse testimonials dengan transformasi avatar URL
+      const testimonialsData = safeJsonParse(data.testimonials);
+      const transformedTestimonials = testimonialsData.map((item: any) => ({
+        name: item.name || '',
+        role: item.role || '',
+        quote: item.quote || '',
+        avatar: item.avatar ? getImageUrl(item.avatar) : '/placeholder.svg'
+      }));
+      
+      program = {
+        ...data,
+        image: getImageUrl(data.image),
+        heroImage: getImageUrl(data.heroImage || data.image),
+        categoryColor: data.categoryColor || 'blue',
+        icon: data.icon || 'school',
+        locations: safeJsonParse(data.locations),
+        objectives: safeJsonParse(data.objectives),
+        activities: safeJsonParse(data.activities),
+        impact: safeJsonParse(data.impact),
+        testimonials: transformedTestimonials
+      };
+    } catch (err) {
+      error = err instanceof Error ? err.message : 'Gagal memuat program';
+    } finally {
+      loading = false;
+    }
+  });
 </script>
 
-{#if !program}
+{#if loading}
   <div class="min-h-screen flex items-center justify-center">
     <div class="text-center">
-      <h1 class="text-4xl font-bold mb-4">Program tidak ditemukan</h1>
-      <a href="{base}/" class="text-blue-600 hover:underline">Kembali ke beranda</a>
+      <div class="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
+      <p class="text-gray-600">Memuat program...</p>
+    </div>
+  </div>
+{:else if error || !program}
+  <div class="min-h-screen flex items-center justify-center">
+    <div class="text-center">
+      <h1 class="text-4xl font-bold mb-4">{error || 'Program tidak ditemukan'}</h1>
+      <a href="{base}/program" class="text-blue-600 hover:underline">Kembali ke daftar program</a>
     </div>
   </div>
 {:else}
@@ -232,16 +294,24 @@
                     <span class="material-icons text-purple-600">event</span>
                     <h4 class="font-bold text-slate-900">Jadwal</h4>
                   </div>
-                  <div class="space-y-2">
-                    <div class="flex items-start gap-2">
-                      <span class="material-icons text-sm text-slate-400 mt-0.5">schedule</span>
-                      <p class="text-slate-700 text-sm">{program.schedule.frequency}</p>
+                  {#if program.scheduleFrequency || program.scheduleDuration}
+                    <div class="space-y-2">
+                      {#if program.scheduleFrequency}
+                        <div class="flex items-start gap-2">
+                          <span class="material-icons text-sm text-slate-400 mt-0.5">schedule</span>
+                          <p class="text-slate-700 text-sm">{program.scheduleFrequency}</p>
+                        </div>
+                      {/if}
+                      {#if program.scheduleDuration}
+                        <div class="flex items-start gap-2">
+                          <span class="material-icons text-sm text-slate-400 mt-0.5">hourglass_empty</span>
+                          <p class="text-slate-700 text-sm">{program.scheduleDuration}</p>
+                        </div>
+                      {/if}
                     </div>
-                    <div class="flex items-start gap-2">
-                      <span class="material-icons text-sm text-slate-400 mt-0.5">hourglass_empty</span>
-                      <p class="text-slate-700 text-sm">{program.schedule.duration}</p>
-                    </div>
-                  </div>
+                  {:else}
+                    <p class="text-slate-500 text-sm">Jadwal akan ditentukan</p>
+                  {/if}
                 </div>
                 
                 <div class="border-t border-slate-200"></div>
