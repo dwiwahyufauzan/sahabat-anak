@@ -1,12 +1,13 @@
 import { Elysia } from 'elysia';
 import { jwt } from '@elysiajs/jwt';
+import { env } from '../config/env';
 
 export const authMiddleware = (app: Elysia) =>
   app
     .use(
       jwt({
         name: 'jwt',
-        secret: process.env.JWT_SECRET || 'super-secret-key-change-in-production',
+        secret: env.JWT_SECRET,
       })
     )
     .derive(async ({ headers, jwt, set }) => {

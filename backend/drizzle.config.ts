@@ -1,14 +1,15 @@
 import { defineConfig } from 'drizzle-kit';
+import { env } from './src/config/env';
 
 export default defineConfig({
   schema: './src/db/schema.ts',
   out: './drizzle',
   dialect: 'mysql',
   dbCredentials: {
-    host: process.env.DB_HOST || 'localhost',
-    port: parseInt(process.env.DB_PORT || '3306'),
-    user: process.env.DB_USER || 'root',
-    ...(process.env.DB_PASSWORD && { password: process.env.DB_PASSWORD }),
-    database: process.env.DB_NAME || 'sahabat_anak',
+    host: env.DB_HOST,
+    port: env.DB_PORT,
+    user: env.DB_USER,
+    password: env.DB_PASSWORD,
+    database: env.DB_NAME,
   },
 });

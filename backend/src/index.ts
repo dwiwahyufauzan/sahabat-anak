@@ -2,6 +2,8 @@ import { Elysia } from 'elysia';
 import { cors } from '@elysiajs/cors';
 import { swagger } from '@elysiajs/swagger';
 import { staticPlugin } from '@elysiajs/static';
+import { env } from './config/env';
+import { rateLimit } from './middleware/rateLimit';
 import { authRoutes } from './routes/auth';
 import { publicRoutes } from './routes/public';
 import { adminProgramRoutes } from './routes/admin/programs';
@@ -18,9 +20,22 @@ const app = new Elysia()
       origin: [
         'http://localhost:5173',
         'http://localhost:5174',
-        process.env.FRONTEND_URL || 'http://localhost:5173'
+        env.FRONTEND_URL
       ],
       credentials: true,
+    })
+  )
+  // Global rate limiting: 100 requests per minute
+  .use(
+    rateLimit({
+      max: 100,
+      duration: 60 * 1000, // 1 minute
+      message: 'Too many requests from this IP, please try again later.',
+      skip: (request) => {
+        // Skip rate limiting for localhost in development
+        const ip = request.headers.get('x-forwarded-for')?.split(',')[0].trim() || 'unknown';
+        return env.NODE_ENV === 'development' && (ip === 'unknown' || ip.includes('127.0.0.1') || ip.includes('localhost'));
+      }
     })
   )
   .use(staticPlugin({
@@ -53,7 +68,9 @@ const app = new Elysia()
   .use(adminVolunteerRoutes)
   .use(adminContactRoutes)
   .use(adminTeamRoutes)
-  .listen(parseInt(process.env.PORT || '3000'));
+  .listen(env.PORT);
 
 console.log(`🚀 Server is running on http://localhost:${app.server?.port}`);
 console.log(`📚 Swagger documentation: http://localhost:${app.server?.port}/swagger`);
+console.log(`🌍 Environment: ${env.NODE_ENV}`);
+console.log(`🔗 CORS enabled for: ${env.FRONTEND_URL}`);

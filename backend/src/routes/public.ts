@@ -5,7 +5,7 @@ import { DonationController } from '../controllers/donation.controller';
 import { VolunteerController } from '../controllers/volunteer.controller';
 import { ContactController } from '../controllers/contact.controller';
 import { TeamController } from '../controllers/team.controller';
-import { savePaymentProof } from '../utils/upload';
+import { secureFileUpload } from '../utils/secureUpload';
 
 export const publicRoutes = new Elysia({ prefix: '/api' })
   // Programs routes
@@ -46,9 +46,13 @@ export const publicRoutes = new Elysia({ prefix: '/api' })
       try {
         let paymentProofPath;
         
-        // Handle file upload if present
+        // Handle file upload if present with secure validation
         if (body.paymentProof) {
-          paymentProofPath = await savePaymentProof(body.paymentProof);
+          paymentProofPath = await secureFileUpload(
+            body.paymentProof,
+            'payment-proofs',
+            'image'
+          );
         }
         
         // Remove paymentProof file from body and add the path instead
@@ -72,7 +76,10 @@ export const publicRoutes = new Elysia({ prefix: '/api' })
         amount: t.String(),
         isAnonymous: t.Optional(t.Number()),
         paymentMethod: t.Optional(t.String()),
-        paymentProof: t.Optional(t.File()),
+        paymentProof: t.Optional(t.File({
+          type: ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'],
+          maxSize: 5 * 1024 * 1024 // 5MB
+        })),
         message: t.Optional(t.String()),
       }),
     }

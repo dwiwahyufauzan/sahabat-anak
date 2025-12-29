@@ -1,6 +1,6 @@
 import { Elysia, t } from 'elysia';
 import { authMiddleware } from '../../middleware/auth';
-import { saveImage, deleteImage } from '../../utils/imageUpload';
+import { secureFileUpload, secureFileDelete } from '../../utils/secureUpload';
 
 export const uploadRoutes = new Elysia({ prefix: '/api/admin/upload' })
   .use(authMiddleware)
@@ -16,7 +16,8 @@ export const uploadRoutes = new Elysia({ prefix: '/api/admin/upload' })
         };
       }
 
-      const imagePath = await saveImage(image, 'team');
+      // Use secure upload utility with validation
+      const imagePath = await secureFileUpload(image, 'team', 'image');
       
       // Extract just the filename
       const filename = imagePath.split('/').pop();
@@ -38,21 +39,26 @@ export const uploadRoutes = new Elysia({ prefix: '/api/admin/upload' })
   }, {
     body: t.Object({
       image: t.File({
-        type: ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'],
+        type: ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'],
         maxSize: 5 * 1024 * 1024 // 5MB
       })
     })
   })
   
-  .delete('/image', async ({ body }) => {
+  .delete('/image', async ({ body, set }) => {
     try {
       const { path } = body as { path: string };
       
       if (!path) {
-        throw new Error('No image path provided');
+        set.status = 400;
+        return {
+          success: false,
+          error: 'No image path provided'
+        };
       }
 
-      await deleteImage(path);
+      // Use secure delete with path validation
+      await secureFileDelete(path);
       
       return {
         success: true,
@@ -60,6 +66,7 @@ export const uploadRoutes = new Elysia({ prefix: '/api/admin/upload' })
       };
     } catch (error: any) {
       console.error('Delete error:', error);
+      set.status = 500;
       return {
         success: false,
         error: error.message || 'Failed to delete image'

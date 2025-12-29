@@ -13,8 +13,12 @@ export class VolunteerController {
     skills?: string;
     motivation?: string;
     availability?: string;
+    status?: 'pending' | 'approved' | 'rejected';
   }) {
-    const result = await db.insert(volunteers).values(data);
+    const result = await db.insert(volunteers).values({
+      ...data,
+      status: data.status || 'pending'
+    });
     return { id: result[0].insertId };
   }
 

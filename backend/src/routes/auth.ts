@@ -1,18 +1,55 @@
 import { Elysia, t } from 'elysia';
 import { jwt } from '@elysiajs/jwt';
+import { env } from '../config/env';
+import { createRateLimiter, RateLimitConfig } from '../middleware/rateLimit';
 import { AuthController } from '../controllers/auth.controller';
+
+// Create dedicated rate limiters for auth endpoints
+const loginRateLimiter = createRateLimiter();
+const registerRateLimiter = createRateLimiter();
+
+// Helper function to check rate limit
+const checkRateLimit = (identifier: string, limiter: ReturnType<typeof createRateLimiter>, config: RateLimitConfig, set: any) => {
+  const isLimited = limiter.check(identifier, config);
+  
+  if (isLimited) {
+    const resetTime = limiter.getResetTime(identifier);
+    set.status = 429;
+    set.headers['Retry-After'] = String(resetTime);
+    set.headers['X-RateLimit-Limit'] = String(config.max);
+    set.headers['X-RateLimit-Remaining'] = '0';
+    set.headers['X-RateLimit-Reset'] = String(resetTime);
+    throw new Error(config.message || `Too many requests. Please try again in ${resetTime} seconds.`);
+  }
+
+  // Set rate limit headers
+  const remaining = limiter.getRemaining(identifier, config);
+  set.headers['X-RateLimit-Limit'] = String(config.max);
+  set.headers['X-RateLimit-Remaining'] = String(remaining);
+  set.headers['X-RateLimit-Reset'] = String(limiter.getResetTime(identifier));
+};
 
 export const authRoutes = new Elysia({ prefix: '/api/auth' })
   .use(
     jwt({
       name: 'jwt',
-      secret: process.env.JWT_SECRET || 'super-secret-key-change-in-production',
+      secret: env.JWT_SECRET,
       exp: '7d',
     })
   )
   .post(
     '/login',
-    async ({ body, jwt, set }) => {
+    async ({ body, jwt, set, request }) => {
+      // Rate limiting: 5 attempts per 15 minutes
+      const forwarded = request.headers.get('x-forwarded-for');
+      const ip = forwarded ? forwarded.split(',')[0].trim() : 'unknown';
+      
+      checkRateLimit(ip, loginRateLimiter, {
+        max: 5,
+        duration: 15 * 60 * 1000, // 15 minutes
+        message: 'Too many login attempts. Please try again in 15 minutes.',
+      }, set);
+
       try {
         const admin = await AuthController.login(body.username, body.password);
 
@@ -37,12 +74,22 @@ export const authRoutes = new Elysia({ prefix: '/api/auth' })
       body: t.Object({
         username: t.String(),
         password: t.String(),
-      }),
-    }
-  )
+          }),
+        }
+      )
   .post(
     '/register',
-    async ({ body, jwt, set }) => {
+    async ({ body, jwt, set, request }) => {
+      // Rate limiting: 3 attempts per hour
+      const forwarded = request.headers.get('x-forwarded-for');
+      const ip = forwarded ? forwarded.split(',')[0].trim() : 'unknown';
+      
+      checkRateLimit(ip, registerRateLimiter, {
+        max: 3,
+        duration: 60 * 60 * 1000, // 1 hour
+        message: 'Too many registration attempts. Please try again later.',
+      }, set);
+
       try {
         const admin = await AuthController.register(body);
 
