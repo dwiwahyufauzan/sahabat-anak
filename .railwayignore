@@ -1,0 +1,15 @@
+# Ignore frontend for backend deployment
+frontend/
+
+# Development files
+*.log
+.env.local
+.DS_Store
+
+# Git
+.git/
+.github/
+
+# Documentation
+*.md
+!README.md
