@@ -3,8 +3,8 @@
   import { adminApi } from '$lib/utils/adminApi';
   import Icon from '$lib/components/admin/Icons.svelte';
   import Modal from '$lib/components/admin/Modal.svelte';
-  import { jsPDF } from 'jspdf';
-  import 'jspdf-autotable';
+  import jsPDF from 'jspdf';
+  import autoTable from 'jspdf-autotable';
 
   let donations: any[] = [];
   let loading = true;
@@ -120,81 +120,308 @@
     try {
       // @ts-ignore - Dynamic import
       const docx = await import('docx');
-      const { Document, Packer, Paragraph, Table, TableCell, TableRow, TextRun, WidthType, AlignmentType } = docx;
+      const { Document, Packer, Paragraph, Table, TableCell, TableRow, TextRun, WidthType, AlignmentType, BorderStyle, Shading, convertInchesToTwip } = docx;
       
       const periodText = showAllMonths 
         ? 'Semua Periode' 
         : `${months[selectedMonth]} ${selectedYear}`;
       
-      const rows = [
-        new TableRow({
+      const currentDate = new Date().toLocaleDateString('id-ID', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+
+      // Header row dengan styling
+      const headerRow = new TableRow({
+        tableHeader: true,
+        children: [
+          new TableCell({
+            width: { size: 8, type: WidthType.PERCENTAGE },
+            shading: { fill: '3B82F6', color: 'FFFFFF' },
+            children: [new Paragraph({ 
+              children: [new TextRun({ text: 'No', bold: true, color: 'FFFFFF' })],
+              alignment: AlignmentType.CENTER 
+            })],
+          }),
+          new TableCell({
+            width: { size: 20, type: WidthType.PERCENTAGE },
+            shading: { fill: '3B82F6', color: 'FFFFFF' },
+            children: [new Paragraph({ 
+              children: [new TextRun({ text: 'Tanggal', bold: true, color: 'FFFFFF' })],
+              alignment: AlignmentType.CENTER 
+            })],
+          }),
+          new TableCell({
+            width: { size: 25, type: WidthType.PERCENTAGE },
+            shading: { fill: '3B82F6', color: 'FFFFFF' },
+            children: [new Paragraph({ 
+              children: [new TextRun({ text: 'Donatur', bold: true, color: 'FFFFFF' })],
+              alignment: AlignmentType.CENTER 
+            })],
+          }),
+          new TableCell({
+            width: { size: 22, type: WidthType.PERCENTAGE },
+            shading: { fill: '3B82F6', color: 'FFFFFF' },
+            children: [new Paragraph({ 
+              children: [new TextRun({ text: 'Email', bold: true, color: 'FFFFFF' })],
+              alignment: AlignmentType.CENTER 
+            })],
+          }),
+          new TableCell({
+            width: { size: 15, type: WidthType.PERCENTAGE },
+            shading: { fill: '3B82F6', color: 'FFFFFF' },
+            children: [new Paragraph({ 
+              children: [new TextRun({ text: 'Jumlah', bold: true, color: 'FFFFFF' })],
+              alignment: AlignmentType.CENTER 
+            })],
+          }),
+          new TableCell({
+            width: { size: 10, type: WidthType.PERCENTAGE },
+            shading: { fill: '3B82F6', color: 'FFFFFF' },
+            children: [new Paragraph({ 
+              children: [new TextRun({ text: 'Status', bold: true, color: 'FFFFFF' })],
+              alignment: AlignmentType.CENTER 
+            })],
+          }),
+        ],
+      });
+
+      // Data rows dengan alternating colors
+      const dataRows = filteredDonations.map((d, index) => {
+        const bgColor = index % 2 === 0 ? 'F9FAFB' : 'FFFFFF';
+        const statusColor = d.paymentStatus === 'completed' ? '10B981' : d.paymentStatus === 'failed' ? 'EF4444' : 'F59E0B';
+        
+        return new TableRow({
           children: [
-            new TableCell({ children: [new Paragraph({ text: 'No', bold: true })] }),
-            new TableCell({ children: [new Paragraph({ text: 'Tanggal', bold: true })] }),
-            new TableCell({ children: [new Paragraph({ text: 'Donatur', bold: true })] }),
-            new TableCell({ children: [new Paragraph({ text: 'Jumlah', bold: true })] }),
-            new TableCell({ children: [new Paragraph({ text: 'Status', bold: true })] }),
+            new TableCell({
+              shading: { fill: bgColor },
+              children: [new Paragraph({ 
+                children: [new TextRun({ text: (index + 1).toString() })],
+                alignment: AlignmentType.CENTER 
+              })],
+            }),
+            new TableCell({
+              shading: { fill: bgColor },
+              children: [new Paragraph({ 
+                children: [new TextRun({ text: formatDate(d.createdAt), size: 20 })]
+              })],
+            }),
+            new TableCell({
+              shading: { fill: bgColor },
+              children: [new Paragraph({ 
+                children: [new TextRun({ text: d.donorName || 'Anonim', bold: true })]
+              })],
+            }),
+            new TableCell({
+              shading: { fill: bgColor },
+              children: [new Paragraph({ 
+                children: [new TextRun({ text: d.donorEmail || '-', size: 20 })]
+              })],
+            }),
+            new TableCell({
+              shading: { fill: bgColor },
+              children: [new Paragraph({ 
+                children: [new TextRun({ text: formatCurrency(d.amount), bold: true, color: '3B82F6' })],
+                alignment: AlignmentType.RIGHT 
+              })],
+            }),
+            new TableCell({
+              shading: { fill: bgColor },
+              children: [new Paragraph({ 
+                children: [new TextRun({ 
+                  text: d.paymentStatus.toUpperCase(), 
+                  bold: true, 
+                  color: statusColor,
+                  size: 18
+                })],
+                alignment: AlignmentType.CENTER 
+              })],
+            }),
           ],
-        }),
-        ...filteredDonations.map((d, index) => 
-          new TableRow({
-            children: [
-              new TableCell({ children: [new Paragraph((index + 1).toString())] }),
-              new TableCell({ children: [new Paragraph(formatDate(d.createdAt))] }),
-              new TableCell({ children: [new Paragraph(d.donorName || 'Anonim')] }),
-              new TableCell({ children: [new Paragraph(formatCurrency(d.amount))] }),
-              new TableCell({ children: [new Paragraph(d.paymentStatus)] }),
-            ],
-          })
-        ),
-      ];
+        });
+      });
 
       const doc = new Document({
         sections: [{
-          properties: {},
+          properties: {
+            page: {
+              margin: {
+                top: convertInchesToTwip(0.75),
+                right: convertInchesToTwip(0.75),
+                bottom: convertInchesToTwip(0.75),
+                left: convertInchesToTwip(0.75),
+              },
+            },
+          },
           children: [
+            // Logo & Title
             new Paragraph({
-              text: 'LAPORAN DONASI',
-              heading: 'Heading1',
+              children: [
+                new TextRun({ 
+                  text: 'LAPORAN DONASI', 
+                  bold: true, 
+                  size: 32, 
+                  color: '1F2937',
+                  font: 'Arial'
+                })
+              ],
               alignment: AlignmentType.CENTER,
+              spacing: { after: 100 },
             }),
             new Paragraph({
-              text: `Yayasan Sahabat Anak`,
+              children: [
+                new TextRun({ 
+                  text: 'YAYASAN SAHABAT ANAK', 
+                  size: 24, 
+                  color: '3B82F6',
+                  bold: true,
+                  font: 'Arial'
+                })
+              ],
               alignment: AlignmentType.CENTER,
+              spacing: { after: 50 },
             }),
             new Paragraph({
-              text: `Periode: ${periodText}`,
+              children: [
+                new TextRun({ 
+                  text: `Periode: ${periodText}`, 
+                  size: 22, 
+                  color: '6B7280',
+                  font: 'Arial'
+                })
+              ],
               alignment: AlignmentType.CENTER,
+              spacing: { after: 50 },
             }),
-            new Paragraph({ text: '' }),
+            new Paragraph({
+              children: [
+                new TextRun({ 
+                  text: `Tanggal Cetak: ${currentDate}`, 
+                  size: 20, 
+                  color: '9CA3AF',
+                  italics: true,
+                  font: 'Arial'
+                })
+              ],
+              alignment: AlignmentType.CENTER,
+              spacing: { after: 300 },
+            }),
+
+            // Table
             new Table({
               width: { size: 100, type: WidthType.PERCENTAGE },
-              rows: rows,
+              rows: [headerRow, ...dataRows],
+              borders: {
+                top: { style: BorderStyle.SINGLE, size: 1, color: 'E5E7EB' },
+                bottom: { style: BorderStyle.SINGLE, size: 1, color: 'E5E7EB' },
+                left: { style: BorderStyle.SINGLE, size: 1, color: 'E5E7EB' },
+                right: { style: BorderStyle.SINGLE, size: 1, color: 'E5E7EB' },
+                insideHorizontal: { style: BorderStyle.SINGLE, size: 1, color: 'E5E7EB' },
+                insideVertical: { style: BorderStyle.SINGLE, size: 1, color: 'E5E7EB' },
+              },
             }),
-            new Paragraph({ text: '' }),
+
+            // Summary Section
+            new Paragraph({ text: '', spacing: { before: 300, after: 200 } }),
             new Paragraph({
               children: [
-                new TextRun({ text: 'Total Donasi: ', bold: true }),
-                new TextRun({ text: `${filteredDonations.length} donasi` }),
+                new TextRun({ text: 'RINGKASAN', bold: true, size: 24, color: '1F2937' })
               ],
+              spacing: { after: 150 },
+            }),
+            new Table({
+              width: { size: 50, type: WidthType.PERCENTAGE },
+              rows: [
+                new TableRow({
+                  children: [
+                    new TableCell({
+                      shading: { fill: 'EFF6FF' },
+                      children: [new Paragraph({ 
+                        children: [new TextRun({ text: 'Total Donasi', bold: true, color: '1F2937' })]
+                      })],
+                    }),
+                    new TableCell({
+                      children: [new Paragraph({ 
+                        children: [new TextRun({ text: `${filteredDonations.length} donasi`, bold: true, color: '3B82F6' })],
+                        alignment: AlignmentType.RIGHT
+                      })],
+                    }),
+                  ],
+                }),
+                new TableRow({
+                  children: [
+                    new TableCell({
+                      shading: { fill: 'EFF6FF' },
+                      children: [new Paragraph({ 
+                        children: [new TextRun({ text: 'Total Nominal', bold: true, color: '1F2937' })]
+                      })],
+                    }),
+                    new TableCell({
+                      children: [new Paragraph({ 
+                        children: [new TextRun({ text: formatCurrency(totalAmount.toString()), bold: true, color: '3B82F6', size: 24 })],
+                        alignment: AlignmentType.RIGHT
+                      })],
+                    }),
+                  ],
+                }),
+                new TableRow({
+                  children: [
+                    new TableCell({
+                      shading: { fill: 'F0FDF4' },
+                      children: [new Paragraph({ 
+                        children: [new TextRun({ text: 'Terverifikasi', bold: true, color: '1F2937' })]
+                      })],
+                    }),
+                    new TableCell({
+                      children: [new Paragraph({ 
+                        children: [new TextRun({ text: `${monthlyCompletedCount} donasi`, bold: true, color: '10B981' })],
+                        alignment: AlignmentType.RIGHT
+                      })],
+                    }),
+                  ],
+                }),
+                new TableRow({
+                  children: [
+                    new TableCell({
+                      shading: { fill: 'FEF3C7' },
+                      children: [new Paragraph({ 
+                        children: [new TextRun({ text: 'Pending', bold: true, color: '1F2937' })]
+                      })],
+                    }),
+                    new TableCell({
+                      children: [new Paragraph({ 
+                        children: [new TextRun({ text: `${monthlyPendingCount} donasi`, bold: true, color: 'F59E0B' })],
+                        alignment: AlignmentType.RIGHT
+                      })],
+                    }),
+                  ],
+                }),
+              ],
+            }),
+
+            // Footer
+            new Paragraph({ text: '', spacing: { before: 400 } }),
+            new Paragraph({
+              children: [
+                new TextRun({ 
+                  text: '───────────────────────────────────────────────────────────', 
+                  color: 'E5E7EB'
+                })
+              ],
+              alignment: AlignmentType.CENTER,
             }),
             new Paragraph({
               children: [
-                new TextRun({ text: 'Total Nominal: ', bold: true }),
-                new TextRun({ text: formatCurrency(totalAmount.toString()) }),
+                new TextRun({ 
+                  text: 'Dokumen ini dibuat secara otomatis oleh sistem', 
+                  size: 18, 
+                  color: '9CA3AF',
+                  italics: true
+                })
               ],
-            }),
-            new Paragraph({
-              children: [
-                new TextRun({ text: 'Terverifikasi: ', bold: true }),
-                new TextRun({ text: `${monthlyCompletedCount} donasi` }),
-              ],
-            }),
-            new Paragraph({
-              children: [
-                new TextRun({ text: 'Pending: ', bold: true }),
-                new TextRun({ text: `${monthlyPendingCount} donasi` }),
-              ],
+              alignment: AlignmentType.CENTER,
+              spacing: { before: 100 },
             }),
           ],
         }],
@@ -222,33 +449,126 @@
         ? 'Semua Periode' 
         : `${months[selectedMonth]} ${selectedYear}`;
       
-      const data = filteredDonations.map((d, index) => ({
+      const printDate = new Date().toLocaleDateString('id-ID', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+
+      // Create workbook
+      const wb = XLSX.utils.book_new();
+
+      // === SHEET 1: COVER / INFO ===
+      const coverData = [
+        ['LAPORAN DONASI'],
+        ['YAYASAN SAHABAT ANAK'],
+        [''],
+        [`Periode: ${periodText}`],
+        [`Tanggal Cetak: ${printDate}`],
+        [''],
+        [''],
+        ['RINGKASAN LAPORAN'],
+        ['Total Donasi', filteredDonations.length + ' donasi'],
+        ['Total Nominal', formatCurrency(totalAmount.toString())],
+        ['Terverifikasi', monthlyCompletedCount + ' donasi'],
+        ['Pending', monthlyPendingCount + ' donasi'],
+      ];
+      
+      const wsCover = XLSX.utils.aoa_to_sheet(coverData);
+      
+      // Styling untuk cover sheet
+      wsCover['!cols'] = [{ wch: 25 }, { wch: 30 }];
+      wsCover['!rows'] = [
+        { hpt: 30 }, // Row 1 - Title
+        { hpt: 25 }, // Row 2 - Subtitle
+        { hpt: 10 }, // Row 3 - Spacing
+        { hpt: 18 }, // Row 4
+        { hpt: 18 }, // Row 5
+      ];
+
+      XLSX.utils.book_append_sheet(wb, wsCover, 'Info');
+
+      // === SHEET 2: DATA DONASI ===
+      const data = filteredDonations.map((d: any, index: number) => ({
         'No': index + 1,
         'Tanggal': formatDate(d.createdAt),
         'Donatur': d.donorName || 'Anonim',
         'Email': d.donorEmail || '-',
         'Telepon': d.donorPhone || '-',
-        'Jumlah': parseInt(d.amount),
+        'Jumlah (Rp)': parseInt(d.amount),
         'Program': d.programId ? `Program #${d.programId}` : 'Donasi Umum',
-        'Status': d.paymentStatus,
+        'Status': d.paymentStatus.toUpperCase(),
         'Metode Pembayaran': d.paymentMethod || '-',
       }));
 
       const ws = XLSX.utils.json_to_sheet(data);
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, 'Donasi');
-
-      // Add summary sheet
-      const summary = [
-        { 'Keterangan': 'Periode', 'Nilai': periodText },
-        { 'Keterangan': 'Total Donasi', 'Nilai': filteredDonations.length },
-        { 'Keterangan': 'Total Nominal', 'Nilai': totalAmount },
-        { 'Keterangan': 'Terverifikasi', 'Nilai': monthlyCompletedCount },
-        { 'Keterangan': 'Pending', 'Nilai': monthlyPendingCount },
+      
+      // Set column widths
+      ws['!cols'] = [
+        { wch: 5 },  // No
+        { wch: 18 }, // Tanggal
+        { wch: 25 }, // Donatur
+        { wch: 30 }, // Email
+        { wch: 15 }, // Telepon
+        { wch: 18 }, // Jumlah
+        { wch: 20 }, // Program
+        { wch: 12 }, // Status
+        { wch: 20 }, // Metode
       ];
-      const wsSummary = XLSX.utils.json_to_sheet(summary);
+
+      XLSX.utils.book_append_sheet(wb, ws, 'Data Donasi');
+
+      // === SHEET 3: RINGKASAN DETAIL ===
+      const summaryDetail = [
+        ['RINGKASAN BERDASARKAN STATUS'],
+        [''],
+        ['Status', 'Jumlah Donasi', 'Total Nominal'],
+        [
+          'Completed', 
+          monthlyCompletedCount,
+          filteredDonations.filter((d: any) => d.paymentStatus === 'completed').reduce((sum: number, d: any) => sum + parseInt(d.amount || 0), 0)
+        ],
+        [
+          'Pending', 
+          monthlyPendingCount,
+          filteredDonations.filter((d: any) => d.paymentStatus === 'pending').reduce((sum: number, d: any) => sum + parseInt(d.amount || 0), 0)
+        ],
+        [
+          'Failed', 
+          filteredDonations.filter((d: any) => d.paymentStatus === 'failed').length,
+          filteredDonations.filter((d: any) => d.paymentStatus === 'failed').reduce((sum: number, d: any) => sum + parseInt(d.amount || 0), 0)
+        ],
+        [''],
+        ['TOTAL', filteredDonations.length, totalAmount],
+        [''],
+        [''],
+        ['RINGKASAN BERDASARKAN BULAN'],
+        [''],
+      ];
+
+      // Group by month
+      const monthlyGroups: { [key: string]: any[] } = {};
+      filteredDonations.forEach((d: any) => {
+        const date = new Date(d.createdAt);
+        const monthYear = `${months[date.getMonth()]} ${date.getFullYear()}`;
+        if (!monthlyGroups[monthYear]) {
+          monthlyGroups[monthYear] = [];
+        }
+        monthlyGroups[monthYear].push(d);
+      });
+
+      summaryDetail.push(['Bulan', 'Jumlah Donasi', 'Total Nominal']);
+      Object.entries(monthlyGroups).forEach(([monthYear, donations]) => {
+        const total = donations.reduce((sum: number, d: any) => sum + parseInt(d.amount || 0), 0);
+        summaryDetail.push([monthYear, donations.length, total]);
+      });
+
+      const wsSummary = XLSX.utils.aoa_to_sheet(summaryDetail);
+      wsSummary['!cols'] = [{ wch: 20 }, { wch: 18 }, { wch: 20 }];
+      
       XLSX.utils.book_append_sheet(wb, wsSummary, 'Ringkasan');
 
+      // Save file
       XLSX.writeFile(wb, `Laporan-Donasi-${periodText.replace(/\s/g, '-')}.xlsx`);
     } catch (error) {
       console.error('Export to Excel failed:', error);
@@ -262,40 +582,179 @@
         ? 'Semua Periode' 
         : `${months[selectedMonth]} ${selectedYear}`;
       
-      const doc = new jsPDF();
+      const printDate = new Date().toLocaleDateString('id-ID', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
       
-      // Title
-      doc.setFontSize(18);
-      doc.text('LAPORAN DONASI', 105, 15, { align: 'center' } as any);
+      const doc = new jsPDF('p', 'mm', 'a4'); // Portrait - sama seperti Word
+      const pageWidth = 210; // A4 portrait width
+      const margin = 25; // Margin 1 inch = ~25mm
+      
+      // === HEADER - sama seperti Word ===
+      doc.setFontSize(22);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(31, 41, 55);
+      doc.text('LAPORAN DONASI', pageWidth / 2, 20, { align: 'center' } as any);
+      
+      doc.setFontSize(16);
+      doc.setTextColor(59, 130, 246);
+      doc.text('YAYASAN SAHABAT ANAK', pageWidth / 2, 30, { align: 'center' } as any);
+      
+      doc.setFontSize(14);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(107, 114, 128);
+      doc.text(`Periode: ${periodText}`, pageWidth / 2, 40, { align: 'center' } as any);
       
       doc.setFontSize(12);
-      doc.text('Yayasan Sahabat Anak', 105, 25, { align: 'center' } as any);
-      doc.text(`Periode: ${periodText}`, 105, 32, { align: 'center' } as any);
+      doc.setFont('helvetica', 'italic');
+      doc.setTextColor(156, 163, 175);
+      doc.text(`Tanggal Cetak: ${printDate}`, pageWidth / 2, 48, { align: 'center' } as any);
 
-      // Table
-      const tableData = filteredDonations.map((d, index) => [
+      // === DATA TABLE - sama seperti Word (5 kolom, tanpa Email) ===
+      const tableData = filteredDonations.map((d: any, index: number) => [
         index + 1,
         formatDate(d.createdAt),
         d.donorName || 'Anonim',
         formatCurrency(d.amount),
-        d.paymentStatus,
+        d.paymentStatus.toUpperCase(),
       ]);
 
-      (doc as any).autoTable({
-        startY: 40,
+      autoTable(doc, {
+        startY: 58,
         head: [['No', 'Tanggal', 'Donatur', 'Jumlah', 'Status']],
         body: tableData,
-        theme: 'grid',
-        headStyles: { fillColor: [59, 130, 246] },
+        theme: 'striped',
+        headStyles: { 
+          fillColor: [59, 130, 246],
+          textColor: [255, 255, 255],
+          fontStyle: 'bold',
+          fontSize: 12,
+          halign: 'center',
+          cellPadding: { top: 3, bottom: 3, left: 2, right: 2 },
+        },
+        bodyStyles: {
+          fontSize: 11,
+          halign: 'center',
+          cellPadding: { top: 2.5, bottom: 2.5, left: 2, right: 2 },
+        },
+        alternateRowStyles: {
+          fillColor: [249, 250, 251],
+        },
+        columnStyles: {
+          0: { cellWidth: 15, halign: 'center' },
+          1: { cellWidth: 38, halign: 'center' },
+          2: { cellWidth: 48, halign: 'center' },
+          3: { cellWidth: 40, halign: 'center', fontStyle: 'bold', textColor: [59, 130, 246] },
+          4: { cellWidth: 29, halign: 'center', fontStyle: 'bold' },
+        },
+        didParseCell: function(data: any) {
+          // Color coding for status column
+          if (data.column.index === 4 && data.section === 'body') {
+            const status = data.cell.raw;
+            if (status === 'COMPLETED') {
+              data.cell.styles.textColor = [16, 185, 129];
+              data.cell.styles.fillColor = [240, 253, 244];
+            } else if (status === 'PENDING') {
+              data.cell.styles.textColor = [245, 158, 11];
+              data.cell.styles.fillColor = [255, 251, 235];
+            } else if (status === 'FAILED') {
+              data.cell.styles.textColor = [239, 68, 68];
+              data.cell.styles.fillColor = [254, 242, 242];
+            }
+          }
+        },
+        margin: { left: 20, right: 20 },
       });
 
-      // Summary
-      const finalY = (doc as any).lastAutoTable.finalY + 10;
-      doc.setFontSize(10);
-      doc.text(`Total Donasi: ${filteredDonations.length} donasi`, 14, finalY);
-      doc.text(`Total Nominal: ${formatCurrency(totalAmount.toString())}`, 14, finalY + 6);
-      doc.text(`Terverifikasi: ${monthlyCompletedCount} donasi`, 14, finalY + 12);
-      doc.text(`Pending: ${monthlyPendingCount} donasi`, 14, finalY + 18);
+      // === RINGKASAN SECTION - sama seperti Word ===
+      const summaryStartY = (doc as any).lastAutoTable.finalY + 15;
+      
+      // Title RINGKASAN
+      doc.setFontSize(16);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(31, 41, 55);
+      doc.text('RINGKASAN', pageWidth / 2, summaryStartY, { align: 'center' } as any);
+
+      // Summary Table - sama seperti Word (70% width, centered)
+      const summaryData = [
+        ['Total Donasi', `${filteredDonations.length} donasi`],
+        ['Total Nominal', formatCurrency(totalAmount.toString())],
+        ['Terverifikasi', `${monthlyCompletedCount} donasi`],
+        ['Pending', `${monthlyPendingCount} donasi`],
+      ];
+
+      const summaryTableWidth = pageWidth * 0.7;
+      const summaryMargin = (pageWidth - summaryTableWidth) / 2;
+
+      autoTable(doc, {
+        startY: summaryStartY + 8,
+        body: summaryData,
+        theme: 'plain',
+        styles: {
+          fontSize: 13,
+          cellPadding: { top: 3, bottom: 3, left: 4, right: 4 },
+          halign: 'center',
+          lineWidth: 0.5,
+          lineColor: [229, 231, 235],
+        },
+        columnStyles: {
+          0: { 
+            fontStyle: 'bold',
+            textColor: [31, 41, 55],
+            fillColor: [239, 246, 255],
+            cellWidth: summaryTableWidth / 2,
+          },
+          1: { 
+            fontStyle: 'bold',
+            cellWidth: summaryTableWidth / 2,
+          },
+        },
+        didParseCell: function(data: any) {
+          // Color coding untuk summary rows
+          if (data.column.index === 1 && data.section === 'body') {
+            if (data.row.index === 0) {
+              data.cell.styles.textColor = [59, 130, 246];
+            } else if (data.row.index === 1) {
+              data.cell.styles.textColor = [59, 130, 246];
+              data.cell.styles.fontSize = 14;
+            } else if (data.row.index === 2) {
+              data.cell.styles.textColor = [16, 185, 129];
+            } else if (data.row.index === 3) {
+              data.cell.styles.textColor = [245, 158, 11];
+            }
+          }
+          // Background untuk label kolom
+          if (data.column.index === 0 && data.section === 'body') {
+            if (data.row.index === 0 || data.row.index === 1) {
+              data.cell.styles.fillColor = [239, 246, 255];
+            } else if (data.row.index === 2) {
+              data.cell.styles.fillColor = [240, 253, 244];
+            } else if (data.row.index === 3) {
+              data.cell.styles.fillColor = [254, 243, 199];
+            }
+          }
+        },
+        margin: { left: summaryMargin, right: summaryMargin },
+      });
+
+      // === FOOTER - sama seperti Word ===
+      const finalY = (doc as any).lastAutoTable.finalY + 15;
+      const pageHeight = doc.internal.pageSize.height;
+      
+      if (finalY < pageHeight - 25) {
+        // Separator line
+        doc.setDrawColor(209, 213, 219);
+        doc.setLineWidth(0.5);
+        doc.line(margin, finalY, pageWidth - margin, finalY);
+        
+        // Footer text
+        doc.setFontSize(11);
+        doc.setFont('helvetica', 'italic');
+        doc.setTextColor(156, 163, 175);
+        doc.text('Dokumen ini dibuat secara otomatis oleh sistem', pageWidth / 2, finalY + 7, { align: 'center' } as any);
+      }
 
       doc.save(`Laporan-Donasi-${periodText.replace(/\s/g, '-')}.pdf`);
     } catch (error) {

@@ -12,6 +12,7 @@
   let showTooltip = '';
   let mounted = false;
   let isMobile = false;
+  let showLogoutModal = false;
 
   onMount(() => {
     mounted = true;
@@ -53,9 +54,16 @@
   };
 
   const handleLogout = () => {
-    if (confirm('Apakah Anda yakin ingin logout?')) {
-      adminStore.logout();
-    }
+    showLogoutModal = true;
+  };
+
+  const confirmLogout = () => {
+    adminStore.logout();
+    showLogoutModal = false;
+  };
+
+  const cancelLogout = () => {
+    showLogoutModal = false;
   };
 
   const handleLogin = () => {
@@ -195,7 +203,7 @@
           />
           <div>
             <h1 class="text-xl font-bold">
-              <span class="text-blue-400">Sahabat</span><span class="text-orange-400">Anak</span>
+              <span class="text-white">Sahabat</span><span class="text-orange-400">Anak</span>
             </h1>
             <p class="text-slate-400 text-xs">Admin Panel</p>
           </div>
@@ -216,7 +224,7 @@
   {#if !isMobile}
     <button
       on:click={toggleSidebar}
-      class="absolute -right-3 top-20 w-6 h-6 bg-linear-to-r from-blue-500 to-orange-500 hover:from-blue-600 hover:to-orange-600 border-2 border-slate-800 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 z-10 shadow-lg"
+      class="absolute -right-3 top-20 w-6 h-6 bg-linear-to-r from-orange-500 to-orange-500 hover:from-orange-600 hover:to-orange-600 border-2 border-slate-800 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 z-10 shadow-lg"
       title={isCollapsed ? 'Expand (Ctrl+B)' : 'Collapse (Ctrl+B)'}
     >
       <Icon name={isCollapsed ? 'chevron-right' : 'chevron-left'} className="w-3 h-3 text-white" />
@@ -381,6 +389,103 @@
     {/if}
   </div>
 </aside>
+
+<!-- Logout Confirmation Modal -->
+{#if showLogoutModal}
+  <div 
+    class="fixed inset-0 backdrop-blur-md bg-black/40 flex items-center justify-center z-100 p-4"
+    on:click={cancelLogout}
+    on:keydown={(e) => e.key === 'Escape' && cancelLogout()}
+    transition:fade={{ duration: 200 }}
+    role="button"
+    tabindex="0"
+  >
+    <div 
+      class="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden"
+      on:click|stopPropagation
+      on:keydown|stopPropagation
+      transition:scale={{ duration: 300, easing: elasticOut }}
+      role="dialog"
+      tabindex="-1"
+    >
+      <!-- Header with gradient -->
+      <div class="bg-linear-to-r from-red-500 via-rose-500 to-orange-500 px-6 py-6 relative overflow-hidden">
+        <!-- Decorative background -->
+        <div class="absolute inset-0 overflow-hidden opacity-20">
+          <div class="absolute -top-12 -right-12 w-32 h-32 bg-white rounded-full blur-2xl"></div>
+          <div class="absolute -bottom-12 -left-12 w-32 h-32 bg-white rounded-full blur-2xl"></div>
+        </div>
+        
+        <div class="relative flex items-center gap-4">
+          <div class="w-14 h-14 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center">
+            <Icon name="logout" className="w-7 h-7 text-white" />
+          </div>
+          <div>
+            <h3 class="text-2xl font-bold text-white">Konfirmasi Logout</h3>
+            <p class="text-red-100 text-sm mt-0.5">Anda akan keluar dari sistem</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Content -->
+      <div class="px-6 py-6">
+        <div class="bg-red-50 border-2 border-red-100 rounded-xl p-4 mb-6">
+          <div class="flex items-start gap-3">
+            <div class="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center shrink-0 mt-0.5">
+              <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+              </svg>
+            </div>
+            <div class="flex-1">
+              <h4 class="text-base font-bold text-gray-900 mb-1">
+                Apakah Anda yakin ingin logout?
+              </h4>
+              <p class="text-sm text-gray-600 leading-relaxed">
+                Anda perlu login kembali untuk mengakses admin panel. Pastikan semua pekerjaan Anda telah tersimpan.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- User Info -->
+        {#if $adminStore.admin}
+          <div class="bg-gray-50 rounded-xl p-4 mb-6 border border-gray-200">
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 bg-linear-to-br from-blue-500 to-orange-500 rounded-full flex items-center justify-center text-xl font-bold text-white shadow-lg">
+                {($adminStore.admin.fullName || 'A')[0].toUpperCase()}
+              </div>
+              <div class="flex-1">
+                <p class="text-xs text-gray-500 mb-0.5">Logged in as</p>
+                <p class="font-bold text-gray-900">{$adminStore.admin.fullName || 'Admin'}</p>
+                {#if $adminStore.admin.email}
+                  <p class="text-xs text-gray-600">{$adminStore.admin.email}</p>
+                {/if}
+              </div>
+            </div>
+          </div>
+        {/if}
+
+        <!-- Action Buttons -->
+        <div class="flex gap-3">
+          <button
+            on:click={cancelLogout}
+            class="flex-1 px-5 py-3.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-semibold transition-all duration-200 hover:scale-105 flex items-center justify-center gap-2"
+          >
+            <Icon name="close" className="w-4 h-4" />
+            Batal
+          </button>
+          <button
+            on:click={confirmLogout}
+            class="flex-1 px-5 py-3.5 bg-linear-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 text-white rounded-xl font-semibold transition-all duration-200 hover:scale-105 shadow-lg shadow-red-500/30 flex items-center justify-center gap-2"
+          >
+            <Icon name="logout" className="w-4 h-4" />
+            Ya, Logout
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+{/if}
 
 <style>
   @keyframes bounce {

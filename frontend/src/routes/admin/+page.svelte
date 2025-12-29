@@ -280,10 +280,10 @@
 
 <div class="p-6 max-w-7xl mx-auto">
   <!-- Hero Section -->
-  <div class="relative overflow-hidden bg-linear-to-br from-blue-500 via-blue-600 to-orange-500 rounded-2xl shadow-xl mb-6">
+  <div class="relative overflow-hidden bg-linear-to-br from-blue-500 via-blue-600 to-blue-500 rounded-2xl shadow-xl mb-6">
     <div class="absolute inset-0 bg-black/10"></div>
     <div class="absolute -top-24 -right-24 w-96 h-96 bg-white/10 rounded-full blur-3xl"></div>
-    <div class="absolute -bottom-24 -left-24 w-96 h-96 bg-orange-400/20 rounded-full blur-3xl"></div>
+    <div class="absolute -bottom-24 -left-24 w-96 h-96 bg-blue-400/20 rounded-full blur-3xl"></div>
     <div class="relative px-8 py-8 text-white">
       <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div class="space-y-2">
@@ -407,7 +407,7 @@
         <div class="bg-linear-to-r from-blue-50 to-orange-100 px-5 py-4 border-b border-gray-200">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-2">
-              <div class="w-8 h-8 bg-linear-to-r from-blue-500 to-orange-500 rounded-lg flex items-center justify-center">
+              <div class="w-8 h-8 bg-linear-to-r from-orange-500 to-orange-500 rounded-lg flex items-center justify-center">
                 <Icon name="trending-up" className="w-5 h-5 text-white" />
               </div>
               <h2 class="text-lg font-bold text-gray-800">Grafik Donasi Tahunan {new Date().getFullYear()}</h2>
