@@ -1,5 +1,6 @@
-<script>
+<script lang="ts">
     import { base } from '$app/paths';
+    import Modal from '$lib/components/shared/Modal.svelte';
     
     let donationAmount = $state(50000);
     let volunteerData = $state({
@@ -11,6 +12,12 @@
     let showDonationModal = $state(false);
     let showVolunteerModal = $state(false);
     let isSubmitting = $state(false);
+    
+    // Modal states
+    let showModal = $state(false);
+    let modalType: 'success' | 'error' | 'warning' | 'info' | undefined = $state('success');
+    let modalTitle = $state('');
+    let modalMessage = $state('');
     
     const donationAmounts = [25000, 50000, 100000, 250000, 500000];
     
@@ -35,7 +42,10 @@
             console.log('Volunteer data:', volunteerData);
             showVolunteerModal = false;
             volunteerData = { name: '', email: '', phone: '' };
-            alert('Pendaftaran relawan berhasil! Kami akan menghubungi Anda.');
+            modalType = 'success';
+            modalTitle = 'Pendaftaran Berhasil!';
+            modalMessage = 'Pendaftaran relawan berhasil! Kami akan menghubungi Anda.';
+            showModal = true;
         } finally {
             isSubmitting = false;
         }
@@ -75,3 +85,10 @@
         </div>
     </div>
 </section>
+
+<Modal 
+  bind:show={showModal}
+  type={modalType}
+  title={modalTitle}
+  message={modalMessage}
+/>

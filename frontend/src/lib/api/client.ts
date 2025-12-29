@@ -1,6 +1,9 @@
 import { env } from '$env/dynamic/public';
+import { dev } from '$app/environment';
 
-const API_URL = env.PUBLIC_API_URL || 'http://localhost:3000';
+const API_URL = dev 
+  ? 'http://localhost:3000' 
+  : import.meta.env.VITE_API_URL?.replace('/api', '') || 'https://api.sahabat-anak.org';
 
 interface ApiOptions extends RequestInit {
   token?: string;

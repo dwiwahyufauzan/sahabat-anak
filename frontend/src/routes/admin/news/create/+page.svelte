@@ -1,6 +1,7 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
   import { adminApi } from '$lib/utils/adminApi';
+  import Modal from '$lib/components/admin/Modal.svelte';
 
   let formData = {
     title: '',
@@ -13,6 +14,12 @@
   };
 
   let isSubmitting = false;
+
+  // Modal states
+  let showModal = false;
+  let modalType: 'success' | 'error' | 'warning' = 'success';
+  let modalTitle = '';
+  let modalMessage = '';
 
   // Generate slug from title
   const generateSlug = () => {
@@ -29,7 +36,10 @@
 
   const handleSubmit = async () => {
     if (!formData.title || !formData.content) {
-      alert('Judul dan konten wajib diisi');
+      modalType = 'warning';
+      modalTitle = 'Peringatan!';
+      modalMessage = 'Judul dan konten wajib diisi';
+      showModal = true;
       return;
     }
 
@@ -62,11 +72,17 @@
       }
 
       await adminApi.news.create(submitData);
-      alert('Berita berhasil dibuat!');
-      goto('/admin/news');
+      modalType = 'success';
+      modalTitle = 'Berhasil!';
+      modalMessage = 'Berita berhasil dibuat!';
+      showModal = true;
+      setTimeout(() => goto('/admin/news'), 1500);
     } catch (error) {
       console.error('Error:', error);
-      alert('Gagal membuat berita: ' + (error instanceof Error ? error.message : 'Unknown error'));
+      modalType = 'error';
+      modalTitle = 'Gagal!';
+      modalMessage = 'Gagal membuat berita: ' + (error instanceof Error ? error.message : 'Unknown error');
+      showModal = true;
     } finally {
       isSubmitting = false;
     }
@@ -217,3 +233,10 @@
     </div>
   </form>
 </div>
+
+<Modal 
+  bind:show={showModal}
+  type={modalType}
+  title={modalTitle}
+  message={modalMessage}
+/>

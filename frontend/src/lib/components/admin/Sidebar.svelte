@@ -1,5 +1,6 @@
 <script lang="ts">
   import { page } from '$app/stores';
+  import { goto } from '$app/navigation';
   import { adminStore } from '$lib/stores/admin';
   import { fly, slide, scale, fade } from 'svelte/transition';
   import { quintOut, elasticOut } from 'svelte/easing';
@@ -55,6 +56,10 @@
     if (confirm('Apakah Anda yakin ingin logout?')) {
       adminStore.logout();
     }
+  };
+
+  const handleLogin = () => {
+    goto('/admin/login');
   };
 
   const toggleSidebar = () => {
@@ -279,68 +284,100 @@
     </ul>
   </nav>
 
-  <!-- Profile & Logout -->
+  <!-- Profile & Login/Logout Button -->
   <div class="relative p-4 border-t border-slate-700/50 backdrop-blur-sm">
-    {#if !isCollapsed || isMobile}
-      <!-- Profile lengkap -->
-      <div class="mb-3 p-4 bg-slate-800/50 rounded-xl border border-slate-700/50">
-        <div class="flex items-center gap-3">
-          <div class="w-12 h-12 bg-linear-to-br from-blue-500 to-orange-500 rounded-full flex items-center justify-center text-xl font-bold shadow-lg">
-            {($adminStore.admin?.fullName || 'A')[0].toUpperCase()}
-          </div>
-          <div class="flex-1 min-w-0">
-            <p class="text-sm text-slate-400">Logged in as</p>
-            <p class="font-bold truncate">{($adminStore.admin?.fullName || 'Admin')}</p>
+    {#if $adminStore.isAuthenticated}
+      <!-- Authenticated State - Show Profile & Logout -->
+      {#if !isCollapsed || isMobile}
+        <!-- Profile lengkap -->
+        <div class="mb-3 p-4 bg-slate-800/50 rounded-xl border border-slate-700/50">
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 bg-linear-to-br from-blue-500 to-orange-500 rounded-full flex items-center justify-center text-xl font-bold shadow-lg">
+              {($adminStore.admin?.fullName || 'A')[0].toUpperCase()}
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-sm text-slate-400">Logged in as</p>
+              <p class="font-bold truncate">{($adminStore.admin?.fullName || 'Admin')}</p>
+            </div>
           </div>
         </div>
-      </div>
 
-      <button
-        on:click={handleLogout}
-        class="w-full flex items-center justify-center gap-3 px-4 py-3 bg-linear-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 rounded-xl transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-red-500/50"
-      >
-        <Icon name="logout" className="w-5 h-5" />
-        <span class="font-semibold">Logout</span>
-      </button>
-    {:else}
-      <!-- Profile mini -->
-      <div class="flex flex-col items-center gap-3">
-        <div 
-          class="w-12 h-12 bg-linear-to-br from-blue-500 to-orange-500 rounded-full flex items-center justify-center text-xl font-bold shadow-lg"
-          on:mouseenter={() => showTooltip = 'profile'}
-          on:mouseleave={() => showTooltip = ''}
-          role="button"
-          tabindex="0"
-        >
-          {($adminStore.admin?.fullName || 'A')[0].toUpperCase()}
-        </div>
-
-        {#if showTooltip === 'profile'}
-          <div class="absolute left-full bottom-80 px-3 py-2 bg-slate-800 text-white text-sm rounded-lg shadow-xl whitespace-nowrap z-50 border border-slate-700" transition:fly={{ x: -10, duration: 200 }}>
-            <div class="text-xs mb-1">Logged in as</div>
-            <div class="font-semibold">{($adminStore.admin?.fullName || 'Admin')}</div>
-            <div class="absolute left-0 top-1/2 -translate-x-1 -translate-y-1/2 w-2 h-2 bg-slate-800 rotate-45 border-l border-b border-slate-700"></div>
-          </div>
-        {/if}
-
-        <!-- Logout mini -->
         <button
           on:click={handleLogout}
-          on:mouseenter={() => showTooltip = 'logout'}
-          on:mouseleave={() => showTooltip = ''}
-          class="w-12 h-12 bg-linear-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 rounded-xl flex items-center justify-center transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-red-500/50"
-          title="Logout"
+          class="w-full flex items-center justify-center gap-3 px-4 py-3 bg-linear-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 rounded-xl transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-red-500/50"
         >
           <Icon name="logout" className="w-5 h-5" />
+          <span class="font-semibold">Logout</span>
+        </button>
+      {:else}
+        <!-- Profile mini -->
+        <div class="flex flex-col items-center gap-3">
+          <div 
+            class="w-12 h-12 bg-linear-to-br from-blue-500 to-orange-500 rounded-full flex items-center justify-center text-xl font-bold shadow-lg"
+            on:mouseenter={() => showTooltip = 'profile'}
+            on:mouseleave={() => showTooltip = ''}
+            role="button"
+            tabindex="0"
+          >
+            {($adminStore.admin?.fullName || 'A')[0].toUpperCase()}
+          </div>
+
+          {#if showTooltip === 'profile'}
+            <div class="absolute left-full bottom-80 px-3 py-2 bg-slate-800 text-white text-sm rounded-lg shadow-xl whitespace-nowrap z-50 border border-slate-700" transition:fly={{ x: -10, duration: 200 }}>
+              <div class="text-xs mb-1">Logged in as</div>
+              <div class="font-semibold">{($adminStore.admin?.fullName || 'Admin')}</div>
+              <div class="absolute left-0 top-1/2 -translate-x-1 -translate-y-1/2 w-2 h-2 bg-slate-800 rotate-45 border-l border-b border-slate-700"></div>
+            </div>
+          {/if}
+
+          <!-- Logout mini -->
+          <button
+            on:click={handleLogout}
+            on:mouseenter={() => showTooltip = 'logout'}
+            on:mouseleave={() => showTooltip = ''}
+            class="w-12 h-12 bg-linear-to-r from-red-600 to-rose-600 hover:from-red-700 hover:to-rose-700 rounded-xl flex items-center justify-center transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-red-500/50"
+            title="Logout"
+          >
+            <Icon name="logout" className="w-5 h-5" />
+          </button>
+
+          {#if showTooltip === 'logout'}
+            <div class="absolute left-full bottom-20 px-3 py-2 bg-slate-800 text-white text-sm rounded-lg shadow-xl whitespace-nowrap z-50 border border-slate-700" transition:fly={{ x: -10, duration: 200 }}>
+              <div class="font-semibold">Logout</div>
+              <div class="absolute left-0 top-1/2 -translate-x-1 -translate-y-1/2 w-2 h-2 bg-slate-800 rotate-45 border-l border-b border-slate-700"></div>
+            </div>
+          {/if}
+        </div>
+      {/if}
+    {:else}
+      <!-- Not Authenticated State - Show Login Button -->
+      {#if !isCollapsed || isMobile}
+        <button
+          on:click={handleLogin}
+          class="w-full flex items-center justify-center gap-3 px-4 py-3 bg-linear-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 rounded-xl transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-blue-500/50"
+        >
+          <Icon name="lock" className="w-5 h-5" />
+          <span class="font-semibold">Login</span>
+        </button>
+      {:else}
+        <!-- Login mini -->
+        <button
+          on:click={handleLogin}
+          on:mouseenter={() => showTooltip = 'login'}
+          on:mouseleave={() => showTooltip = ''}
+          class="w-12 h-12 bg-linear-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 rounded-xl flex items-center justify-center transition-all duration-300 hover:scale-110 hover:shadow-lg hover:shadow-blue-500/50"
+          title="Login"
+        >
+          <Icon name="lock" className="w-5 h-5" />
         </button>
 
-        {#if showTooltip === 'logout'}
+        {#if showTooltip === 'login'}
           <div class="absolute left-full bottom-20 px-3 py-2 bg-slate-800 text-white text-sm rounded-lg shadow-xl whitespace-nowrap z-50 border border-slate-700" transition:fly={{ x: -10, duration: 200 }}>
-            <div class="font-semibold">Logout</div>
+            <div class="font-semibold">Login</div>
             <div class="absolute left-0 top-1/2 -translate-x-1 -translate-y-1/2 w-2 h-2 bg-slate-800 rotate-45 border-l border-b border-slate-700"></div>
           </div>
         {/if}
-      </div>
+      {/if}
     {/if}
   </div>
 </aside>

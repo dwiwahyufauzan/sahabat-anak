@@ -1,5 +1,6 @@
-<script>
+<script lang="ts">
     import { api } from '$lib/api/client';
+    import Modal from '$lib/components/shared/Modal.svelte';
     
     let formData = {
         name: '',
@@ -10,6 +11,12 @@
     
     let isSubmitting = false;
     let error = '';
+    
+    // Modal states
+    let showModal = false;
+    let modalType: 'success' | 'error' | 'warning' | 'info' = 'success';
+    let modalTitle = '';
+    let modalMessage = '';
     
     async function handleSubmit() {
         isSubmitting = true;
@@ -23,14 +30,22 @@
                 message: formData.message
             });
             
-            alert('Pesan Anda telah terkirim! Kami akan segera menghubungi Anda.');
+            modalType = 'success';
+            modalTitle = 'Pesan Terkirim!';
+            modalMessage = 'Pesan Anda telah terkirim! Kami akan segera menghubungi Anda.';
+            showModal = true;
             
             // Reset form
-            formData = { name: '', email: '', subject: '', message: '' };
+            setTimeout(() => {
+                formData = { name: '', email: '', subject: '', message: '' };
+            }, 1500);
         } catch (err) {
             console.error('Error submitting contact form:', err);
             error = err instanceof Error ? err.message : 'Terjadi kesalahan saat mengirim pesan. Silakan coba lagi.';
-            alert(error);
+            modalType = 'error';
+            modalTitle = 'Pesan Gagal Terkirim';
+            modalMessage = error;
+            showModal = true;
         } finally {
             isSubmitting = false;
         }
@@ -126,3 +141,10 @@
         </button>
     </form>
 </div>
+
+<Modal 
+  bind:show={showModal}
+  type={modalType}
+  title={modalTitle}
+  message={modalMessage}
+/>

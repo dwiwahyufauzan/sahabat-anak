@@ -6,9 +6,16 @@
     import AmountSelector from './AmountSelector.svelte';
     import PaymentMethods from './PaymentMethods.svelte';
     import DonorInfo from './DonorInfo.svelte';
+    import Modal from '$lib/components/shared/Modal.svelte';
     
     let isSubmitting = $state(false);
     let error = $state('');
+    
+    // Modal states
+    let showModal = $state(false);
+    let modalType = $state(/** @type {'success' | 'error' | 'warning' | 'info'} */ ('success'));
+    let modalTitle = $state('');
+    let modalMessage = $state('');
     /**
    * @type {File | null}
    */
@@ -23,13 +30,19 @@
         if (file) {
             // Validate file size (max 5MB)
             if (file.size > 5 * 1024 * 1024) {
-                alert('Ukuran file maksimal 5MB');
+                modalType = 'warning';
+                modalTitle = 'File Terlalu Besar';
+                modalMessage = 'Ukuran file maksimal 5MB. Silakan pilih file yang lebih kecil.';
+                showModal = true;
                 target.value = '';
                 return;
             }
             // Validate file type
             if (!['image/jpeg', 'image/jpg', 'image/png', 'image/webp'].includes(file.type)) {
-                alert('Format file harus JPG, PNG, atau WebP');
+                modalType = 'warning';
+                modalTitle = 'Format File Tidak Valid';
+                modalMessage = 'Format file harus JPG, PNG, atau WebP.';
+                showModal = true;
                 target.value = '';
                 return;
             }
@@ -83,14 +96,20 @@
                 throw new Error(errorData.error || 'Failed to submit donation');
             }
             
-            alert('Terima kasih atas donasi Anda! Bukti transfer telah diterima.');
+            modalType = 'success';
+            modalTitle = 'Donasi Berhasil!';
+            modalMessage = 'Terima kasih atas donasi Anda! Bukti transfer telah diterima. Tim kami akan segera memverifikasi donasi Anda.';
+            showModal = true;
             
-            // Reset form
-            window.location.reload();
+            // Reset form after modal closes
+            setTimeout(() => window.location.reload(), 2000);
         } catch (err) {
             console.error('Error submitting donation:', err);
             error = err instanceof Error ? err.message : 'Terjadi kesalahan saat memproses donasi. Silakan coba lagi.';
-            alert(error);
+            modalType = 'error';
+            modalTitle = 'Donasi Gagal';
+            modalMessage = error;
+            showModal = true;
         } finally {
             isSubmitting = false;
         }
@@ -181,3 +200,10 @@
         </div>
     </div>
 </section>
+
+<Modal 
+  bind:show={showModal}
+  type={modalType}
+  title={modalTitle}
+  message={modalMessage}
+/>

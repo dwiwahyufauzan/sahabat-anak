@@ -28,6 +28,10 @@
 		"vite": "^7.2.6"
 	},
 	"dependencies": {
-		"qrcode": "^1.5.4"
+		"docx": "^9.5.1",
+		"jspdf": "^3.0.4",
+		"jspdf-autotable": "^5.0.2",
+		"qrcode": "^1.5.4",
+		"xlsx": "^0.18.5"
 	}
 }

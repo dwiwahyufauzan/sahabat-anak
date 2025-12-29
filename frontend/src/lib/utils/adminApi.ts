@@ -1,6 +1,7 @@
 import { browser } from '$app/environment';
+import config from '$lib/config';
 
-const API_BASE = 'http://localhost:3000/api';
+const API_BASE = config.apiUrl;
 
 function getAuthHeaders() {
   const token = browser ? localStorage.getItem('admin_token') : null;
@@ -147,6 +148,15 @@ news: {
     getAll: async () => {
       const response = await fetch(`${API_BASE}/admin/volunteers`, {
         headers: getAuthHeaders()
+      });
+      return handleResponse(response);
+    },
+    
+    create: async (data: any) => {
+      const response = await fetch(`${API_BASE}/admin/volunteers`, {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify(data)
       });
       return handleResponse(response);
     },

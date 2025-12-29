@@ -1,4 +1,6 @@
-<script>
+<script lang="ts">
+    import Modal from '$lib/components/shared/Modal.svelte';
+    
     // Form state dengan Svelte 5 runes
     let donationAmount = $state(50000);
     let volunteerForm = $state({
@@ -11,6 +13,12 @@
     
     let showDonationForm = $state(false);
     let showVolunteerForm = $state(false);
+    
+    // Modal states
+    let showModal = $state(false);
+    let modalType: 'success' | 'error' | 'warning' | 'info' = $state('success');
+    let modalTitle = $state('');
+    let modalMessage = $state('');
     
     // Preset donation amounts
     const donationAmounts = [25000, 50000, 100000, 250000, 500000];
@@ -34,7 +42,10 @@
         });
         
         if (response.ok) {
-            alert('Pendaftaran relawan berhasil!');
+            modalType = 'success';
+            modalTitle = 'Pendaftaran Berhasil!';
+            modalMessage = 'Pendaftaran relawan berhasil! Kami akan segera menghubungi Anda.';
+            showModal = true;
             // Reset form
             volunteerForm = { name: '', email: '', phone: '', city: '', skills: [] };
             showVolunteerForm = false;
@@ -172,3 +183,10 @@
         {/if}
     </div>
 </section>
+
+<Modal 
+  bind:show={showModal}
+  type={modalType}
+  title={modalTitle}
+  message={modalMessage}
+/>

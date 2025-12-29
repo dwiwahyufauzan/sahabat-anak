@@ -3,11 +3,19 @@
   import { adminApi } from '$lib/utils/adminApi';
   import { goto } from '$app/navigation';
   import Icon from '$lib/components/admin/Icons.svelte';
+  import Modal from '$lib/components/admin/Modal.svelte';
   import { getImageUrl } from '$lib/utils/image';
 
   let programs: any[] = [];
   let loading = true;
   let deleting: number | null = null;
+
+  // Modal states
+  let showModal = false;
+  let modalType: 'success' | 'error' | 'confirm' = 'success';
+  let modalTitle = '';
+  let modalMessage = '';
+  let deleteTarget: number | null = null;
 
   onMount(async () => {
     await loadPrograms();
@@ -25,16 +33,32 @@
   };
 
   const handleDelete = async (id: number) => {
-    if (!confirm('Apakah Anda yakin ingin menghapus program ini?')) return;
+    deleteTarget = id;
+    modalType = 'confirm';
+    modalTitle = 'Hapus Program?';
+    modalMessage = 'Apakah Anda yakin ingin menghapus program ini? Tindakan ini tidak dapat dibatalkan.';
+    showModal = true;
+  };
 
-    deleting = id;
+  const confirmDelete = async () => {
+    if (!deleteTarget) return;
+    
+    deleting = deleteTarget;
     try {
-      await adminApi.programs.delete(id);
+      await adminApi.programs.delete(deleteTarget);
       await loadPrograms();
+      modalType = 'success';
+      modalTitle = 'Berhasil!';
+      modalMessage = 'Program berhasil dihapus';
+      showModal = true;
     } catch (error) {
-      alert('Gagal menghapus program');
+      modalType = 'error';
+      modalTitle = 'Gagal!';
+      modalMessage = 'Gagal menghapus program';
+      showModal = true;
     } finally {
       deleting = null;
+      deleteTarget = null;
     }
   };
 
@@ -169,7 +193,7 @@
               <td class="px-4 py-3 text-xs">
                 <div class="flex gap-2">
                   <a
-                    href="/admin/programs/{program.id}"
+                    href="/admin/programs/edit/{program.id}"
                     class="px-3 py-1 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-lg font-medium transition-colors flex items-center gap-1"
                   >
                     <Icon name="edit" className="w-3 h-3" />
@@ -196,3 +220,12 @@
     </div>
   {/if}
 </div>
+
+<Modal 
+  bind:show={showModal}
+  type={modalType}
+  title={modalTitle}
+  message={modalMessage}
+  confirmText={modalType === 'confirm' ? 'Hapus' : 'OK'}
+  onConfirm={modalType === 'confirm' ? confirmDelete : null}
+/>

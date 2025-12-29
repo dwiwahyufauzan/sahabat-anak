@@ -3,10 +3,18 @@
   import { adminApi } from '$lib/utils/adminApi';
   import { goto } from '$app/navigation';
   import Icon from '$lib/components/admin/Icons.svelte';
+  import Modal from '$lib/components/admin/Modal.svelte';
 
   let news: any[] = [];
   let loading = true;
   let deleting: number | null = null;
+
+  // Modal states
+  let showModal = false;
+  let modalType: 'success' | 'error' | 'confirm' = 'success';
+  let modalTitle = '';
+  let modalMessage = '';
+  let deleteTarget: number | null = null;
 
   onMount(async () => {
     await loadNews();
@@ -24,16 +32,32 @@
   };
 
   const handleDelete = async (id: number) => {
-    if (!confirm('Apakah Anda yakin ingin menghapus berita ini?')) return;
+    deleteTarget = id;
+    modalType = 'confirm';
+    modalTitle = 'Hapus Berita?';
+    modalMessage = 'Apakah Anda yakin ingin menghapus berita ini? Tindakan ini tidak dapat dibatalkan.';
+    showModal = true;
+  };
 
-    deleting = id;
+  const confirmDelete = async () => {
+    if (!deleteTarget) return;
+    
+    deleting = deleteTarget;
     try {
-      await adminApi.news.delete(id);
+      await adminApi.news.delete(deleteTarget);
       await loadNews();
+      modalType = 'success';
+      modalTitle = 'Berhasil!';
+      modalMessage = 'Berita berhasil dihapus';
+      showModal = true;
     } catch (error) {
-      alert('Gagal menghapus berita');
+      modalType = 'error';
+      modalTitle = 'Gagal!';
+      modalMessage = 'Gagal menghapus berita';
+      showModal = true;
     } finally {
       deleting = null;
+      deleteTarget = null;
     }
   };
 
@@ -151,3 +175,12 @@
     </div>
   {/if}
 </div>
+
+<Modal 
+  bind:show={showModal}
+  type={modalType}
+  title={modalTitle}
+  message={modalMessage}
+  confirmText={modalType === 'confirm' ? 'Hapus' : 'OK'}
+  onConfirm={modalType === 'confirm' ? confirmDelete : null}
+/>

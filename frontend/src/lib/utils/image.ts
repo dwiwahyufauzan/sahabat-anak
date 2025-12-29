@@ -1,4 +1,8 @@
-const BACKEND_URL = 'http://localhost:3000';
+import { dev } from '$app/environment';
+
+const BACKEND_URL = dev 
+  ? 'http://localhost:3000' 
+  : import.meta.env.VITE_API_URL?.replace('/api', '') || 'https://api.sahabat-anak.org';
 
 /**
  * Get full image URL from relative path

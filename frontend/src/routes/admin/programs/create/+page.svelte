@@ -1,6 +1,7 @@
 <script lang="ts">
   import { adminApi } from '$lib/utils/adminApi';
   import { goto } from '$app/navigation';
+  import Modal from '$lib/components/admin/Modal.svelte';
 
   let formData = {
     slug: '',
@@ -31,6 +32,13 @@
   let imagePreview = '';
   let heroImageFile: File | null = null;
   let heroImagePreview = '';
+
+  // Modal state
+  let showModal = false;
+  let modalType: 'success' | 'error' | 'warning' | 'confirm' = 'success';
+  let modalTitle = '';
+  let modalMessage = '';
+  let confirmFunction: (() => void) | null = null;
 
   // Helper inputs
   let newObjective = '';
@@ -139,8 +147,11 @@
       };
 
       await adminApi.programs.create(submitData);
-      alert('Program berhasil ditambahkan!');
-      goto('/admin/programs');
+      modalType = 'success';
+      modalTitle = 'Berhasil!';
+      modalMessage = 'Program berhasil ditambahkan!';
+      showModal = true;
+      setTimeout(() => goto('/admin/programs'), 1500);
     } catch (err) {
       console.error('Error creating program:', err);
       error = err instanceof Error ? err.message : 'Gagal membuat program. Silakan coba lagi.';
@@ -741,3 +752,11 @@
     </form>
   </div>
 </div>
+
+<Modal
+  bind:show={showModal}
+  type={modalType}
+  title={modalTitle}
+  message={modalMessage}
+  onConfirm={confirmFunction}
+/>

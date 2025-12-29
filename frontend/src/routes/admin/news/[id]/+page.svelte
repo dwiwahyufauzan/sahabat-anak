@@ -3,6 +3,7 @@
   import { page } from '$app/stores';
   import { goto } from '$app/navigation';
   import { adminApi } from '$lib/utils/adminApi';
+  import Modal from '$lib/components/admin/Modal.svelte';
 
   let formData = {
     title: '',
@@ -16,6 +17,13 @@
   let isLoading = true;
   let isSubmitting = false;
   let newsId: number;
+
+  // Modal state
+  let showModal = false;
+  let modalType: 'success' | 'error' | 'warning' | 'confirm' = 'success';
+  let modalTitle = '';
+  let modalMessage = '';
+  let confirmFunction: (() => void) | null = null;
 
   onMount(async () => {
     newsId = parseInt($page.params.id || '0');
@@ -35,8 +43,11 @@
         author: newsItem.author || ''
       };
     } catch (error) {
-      alert('Gagal memuat berita');
-      goto('/admin/news');
+      modalType = 'error';
+      modalTitle = 'Gagal Memuat';
+      modalMessage = 'Gagal memuat berita';
+      showModal = true;
+      setTimeout(() => goto('/admin/news'), 1500);
     } finally {
       isLoading = false;
     }
@@ -44,17 +55,26 @@
 
   const handleSubmit = async () => {
     if (!formData.title || !formData.content) {
-      alert('Judul dan konten wajib diisi');
+      modalType = 'warning';
+      modalTitle = 'Data Tidak Lengkap';
+      modalMessage = 'Judul dan konten wajib diisi';
+      showModal = true;
       return;
     }
 
     isSubmitting = true;
     try {
       await adminApi.news.update(newsId, formData);
-      alert('Berita berhasil diupdate!');
-      goto('/admin/news');
+      modalType = 'success';
+      modalTitle = 'Berhasil!';
+      modalMessage = 'Berita berhasil diupdate!';
+      showModal = true;
+      setTimeout(() => goto('/admin/news'), 1500);
     } catch (error) {
-      alert('Gagal mengupdate berita: ' + (error instanceof Error ? error.message : 'Unknown error'));
+      modalType = 'error';
+      modalTitle = 'Gagal Update';
+      modalMessage = 'Gagal mengupdate berita: ' + (error instanceof Error ? error.message : 'Unknown error');
+      showModal = true;
     } finally {
       isSubmitting = false;
     }
@@ -194,3 +214,11 @@
     </form>
   {/if}
 </div>
+
+<Modal
+  bind:show={showModal}
+  type={modalType}
+  title={modalTitle}
+  message={modalMessage}
+  onConfirm={confirmFunction}
+/>

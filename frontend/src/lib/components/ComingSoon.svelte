@@ -4,11 +4,11 @@
   export let showIcon = true;
 </script>
 
-<div class="flex flex-col items-center justify-center py-20 px-4 bg-gradient-to-br from-blue-50 to-orange-50 dark:from-slate-800 dark:to-slate-900 rounded-2xl border-2 border-dashed border-blue-200 dark:border-slate-700">
+<div class="flex flex-col items-center justify-center py-20 px-4 bg-linear-to-br from-blue-50 to-orange-50 dark:from-slate-800 dark:to-slate-900 rounded-2xl border-2 border-dashed border-blue-200 dark:border-slate-700">
   {#if showIcon}
     <div class="relative mb-6">
       <div class="absolute inset-0 bg-blue-400 rounded-full blur-xl opacity-20 animate-pulse"></div>
-      <div class="relative w-24 h-24 bg-gradient-to-br from-blue-400 to-orange-400 rounded-full flex items-center justify-center">
+      <div class="relative w-24 h-24 bg-linear-to-br from-blue-400 to-orange-400 rounded-full flex items-center justify-center">
         <span class="material-symbols-outlined text-white text-5xl">schedule</span>
       </div>
     </div>

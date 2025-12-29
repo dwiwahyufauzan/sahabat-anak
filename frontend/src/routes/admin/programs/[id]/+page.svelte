@@ -2,6 +2,7 @@
   import { onMount } from 'svelte';
   import { adminApi } from '$lib/utils/adminApi';
   import Icon from '$lib/components/admin/Icons.svelte';
+  import Modal from '$lib/components/admin/Modal.svelte';
 
   let team: any[] = [];
   let loading = true;
@@ -16,6 +17,13 @@
   let imageFile: File | null = null;
   let imagePreview: string = '';
   let uploading = false;
+
+  // Modal state
+  let showModal = false;
+  let modalType: 'success' | 'error' | 'warning' | 'confirm' = 'success';
+  let modalTitle = '';
+  let modalMessage = '';
+  let confirmFunction: (() => void) | null = null;
 
   let formData: {
     name: string;
@@ -155,9 +163,15 @@
       
       resetForm();
       await loadTeam();
-      alert('Data berhasil disimpan!');
+      modalType = 'success';
+      modalTitle = 'Berhasil!';
+      modalMessage = 'Data berhasil disimpan!';
+      showModal = true;
     } catch (error: any) {
-      alert(error.message || 'Gagal menyimpan data tim');
+      modalType = 'error';
+      modalTitle = 'Gagal Menyimpan';
+      modalMessage = error.message || 'Gagal menyimpan data tim';
+      showModal = true;
     } finally {
       uploading = false;
     }
@@ -194,17 +208,28 @@
   };
 
   const handleDelete = async (id: number) => {
-    if (!confirm('Apakah Anda yakin ingin menghapus anggota tim ini?')) return;
-
-    deleting = id;
-    try {
-      await adminApi.team.delete(id);
-      await loadTeam();
-    } catch (error) {
-      alert('Gagal menghapus anggota tim');
-    } finally {
-      deleting = null;
-    }
+    modalType = 'confirm';
+    modalTitle = 'Konfirmasi Hapus';
+    modalMessage = 'Apakah Anda yakin ingin menghapus anggota tim ini?';
+    confirmFunction = async () => {
+      deleting = id;
+      try {
+        await adminApi.team.delete(id);
+        await loadTeam();
+        modalType = 'success';
+        modalTitle = 'Berhasil!';
+        modalMessage = 'Anggota tim berhasil dihapus';
+        showModal = true;
+      } catch (error) {
+        modalType = 'error';
+        modalTitle = 'Gagal Menghapus';
+        modalMessage = 'Gagal menghapus anggota tim';
+        showModal = true;
+      } finally {
+        deleting = null;
+      }
+    };
+    showModal = true;
   };
 
   const addExpertise = () => {
@@ -873,3 +898,13 @@
     {/if}
   {/if}
 </div>
+
+<Modal
+  bind:show={showModal}
+  type={modalType}
+  title={modalTitle}
+  message={modalMessage}
+  onConfirm={confirmFunction}
+  confirmText="OK"
+  cancelText="Batal"
+/>

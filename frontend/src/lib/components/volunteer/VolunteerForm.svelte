@@ -2,6 +2,14 @@
   import { formData, formErrors, isSubmitting, resetForm } from '$lib/stores/volunteerForm';
   import { volunteerCategories } from '$lib/data/volunteer';
   import { api } from '$lib/api/client';
+  import Modal from '$lib/components/shared/Modal.svelte';
+  
+  // Modal states
+  let showModal = $state(false);
+  /** @type {'success' | 'error' | 'warning' | 'info'} */
+  let modalType = $state('success');
+  let modalTitle = $state('');
+  let modalMessage = $state('');
 
   /**
    * @param {string} email
@@ -74,12 +82,18 @@
         availability: $formData.availability || ''
       });
       
-      alert(`Terima kasih ${$formData.name}! Pendaftaran Anda telah diterima. Kami akan menghubungi Anda melalui email di ${$formData.email}`);
+      modalType = 'success';
+      modalTitle = 'Pendaftaran Berhasil!';
+      modalMessage = `Terima kasih ${$formData.name}! Pendaftaran Anda telah diterima. Kami akan menghubungi Anda melalui email di ${$formData.email}`;
+      showModal = true;
       
-      resetForm();
+      setTimeout(() => resetForm(), 2000);
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Silakan coba lagi.';
-      alert(`Terjadi kesalahan: ${message}`);
+      modalType = 'error';
+      modalTitle = 'Pendaftaran Gagal';
+      modalMessage = `Terjadi kesalahan: ${message}`;
+      showModal = true;
       console.error('Failed to submit volunteer form:', error);
     } finally {
       $isSubmitting = false;
@@ -290,3 +304,10 @@
     </form>
   </div>
 </section>
+
+<Modal 
+  bind:show={showModal}
+  type={modalType}
+  title={modalTitle}
+  message={modalMessage}
+/>

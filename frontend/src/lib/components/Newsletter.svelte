@@ -1,12 +1,22 @@
-<script>
+<script lang="ts">
   import { onMount } from 'svelte';
+  import Modal from '$lib/components/shared/Modal.svelte';
   
   let email = '';
   let visible = false;
   
+  // Modal states
+  let showModal = false;
+  let modalType: 'success' | 'error' | 'warning' | 'info' = 'success';
+  let modalTitle = '';
+  let modalMessage = '';
+  
   function handleSubscribe() {
     if (email) {
-      alert(`Terima kasih! Email ${email} telah terdaftar.`);
+      modalType = 'success';
+      modalTitle = 'Berhasil Berlangganan!';
+      modalMessage = `Terima kasih! Email ${email} telah terdaftar untuk newsletter kami.`;
+      showModal = true;
       email = '';
     }
   }
@@ -60,3 +70,10 @@
     </form>
   </div>
 </section>
+
+<Modal 
+  bind:show={showModal}
+  type={modalType}
+  title={modalTitle}
+  message={modalMessage}
+/>

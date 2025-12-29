@@ -2,6 +2,7 @@
   import { onMount } from 'svelte';
   import { adminApi } from '$lib/utils/adminApi';
   import Icon from '$lib/components/admin/Icons.svelte';
+  import Modal from '$lib/components/admin/Modal.svelte';
 
   let contacts: any[] = [];
   let filteredContacts: any[] = [];
@@ -18,6 +19,13 @@
   // View detail modal  
   let showDetailModal = false;
   let detailContact: any = null;
+
+  // Alert/Confirm Modal
+  let showModal = false;
+  let modalType: 'success' | 'error' | 'confirm' = 'success';
+  let modalTitle = '';
+  let modalMessage = '';
+  let deleteTarget: number | null = null;
 
   onMount(async () => {
     await loadContacts();
@@ -66,7 +74,10 @@
       await adminApi.contacts.updateStatus(id, 'read');
       await loadContacts();
     } catch (error) {
-      alert('Gagal menandai sebagai dibaca');
+      modalType = 'error';
+      modalTitle = 'Gagal!';
+      modalMessage = 'Gagal menandai sebagai dibaca';
+      showModal = true;
     }
   };
 
@@ -84,18 +95,27 @@
 
   const sendReply = async () => {
     if (!replyMessage.trim()) {
-      alert('Pesan balasan tidak boleh kosong');
+      modalType = 'error';
+      modalTitle = 'Peringatan!';
+      modalMessage = 'Pesan balasan tidak boleh kosong';
+      showModal = true;
       return;
     }
 
     sendingReply = true;
     try {
       await adminApi.contacts.sendReply(selectedContact.id, replyMessage);
-      alert('Balasan berhasil dikirim!');
+      modalType = 'success';
+      modalTitle = 'Berhasil!';
+      modalMessage = 'Balasan berhasil dikirim!';
+      showModal = true;
       closeReplyModal();
       await loadContacts();
     } catch (error: any) {
-      alert(error.message || 'Gagal mengirim balasan');
+      modalType = 'error';
+      modalTitle = 'Gagal!';
+      modalMessage = error.message || 'Gagal mengirim balasan';
+      showModal = true;
     } finally {
       sendingReply = false;
     }
@@ -116,13 +136,30 @@
   };
 
   const deleteContact = async (id: number) => {
-    if (!confirm('Yakin ingin menghapus pesan ini?')) return;
+    deleteTarget = id;
+    modalType = 'confirm';
+    modalTitle = 'Hapus Pesan?';
+    modalMessage = 'Yakin ingin menghapus pesan ini? Tindakan ini tidak dapat dibatalkan.';
+    showModal = true;
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteTarget) return;
     
     try {
-      await adminApi.contacts.delete(id);
+      await adminApi.contacts.delete(deleteTarget);
       await loadContacts();
+      modalType = 'success';
+      modalTitle = 'Berhasil!';
+      modalMessage = 'Pesan berhasil dihapus';
+      showModal = true;
     } catch (error) {
-      alert('Gagal menghapus pesan');
+      modalType = 'error';
+      modalTitle = 'Gagal!';
+      modalMessage = 'Gagal menghapus pesan';
+      showModal = true;
+    } finally {
+      deleteTarget = null;
     }
   };
 
@@ -425,7 +462,11 @@
         <div class="flex gap-3 pt-4">
           {#if detailContact.status !== 'replied'}
             <button
-              on:click={() => { closeDetailModal(); openReplyModal(detailContact); }}
+              on:click={() => {
+                const contact = detailContact;
+                closeDetailModal();
+                setTimeout(() => openReplyModal(contact), 100);
+              }}
               class="flex-1 px-6 py-3 bg-linear-to-r from-orange-500 to-blue-500 hover:from-orange-600 hover:to-blue-600 text-white rounded-xl font-semibold transition-all flex items-center justify-center gap-2"
             >
               <Icon name="send" className="w-5 h-5" />
@@ -444,6 +485,14 @@
   </div>
 {/if}
 
+<!-- Alert/Confirm Modal -->
+<Modal
+  type={modalType}
+  title={modalTitle}
+  message={modalMessage}
+  bind:show={showModal}
+  onConfirm={modalType === 'confirm' ? confirmDelete : undefined}
+/>
 <!-- Reply Modal -->
 {#if showReplyModal && selectedContact}
   <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" role="button" tabindex="0" on:click={closeReplyModal} on:keydown={(e) => e.key === 'Escape' && closeReplyModal()}>

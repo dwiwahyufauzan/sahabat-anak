@@ -1,5 +1,6 @@
 import { writable } from 'svelte/store';
 import { browser } from '$app/environment';
+import config from '$lib/config';
 
 interface Admin {
   id: number;
@@ -9,6 +10,7 @@ interface Admin {
 }
 
 interface AdminState {
+  isAuthenticated: any;
   admin: Admin | null;
   token: string | null;
   loading: boolean;
@@ -17,7 +19,8 @@ interface AdminState {
 const initialState: AdminState = {
   admin: null,
   token: browser ? localStorage.getItem('admin_token') : null,
-  loading: false
+  loading: false,
+  isAuthenticated: false // Always start as false, will be set by checkAuth
 };
 
 function createAdminStore() {
@@ -29,7 +32,7 @@ function createAdminStore() {
       update(state => ({ ...state, loading: true }));
       
       try {
-        const response = await fetch('http://localhost:3000/api/auth/login', {
+        const response = await fetch(`${config.apiUrl}/auth/login`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ username, password })
@@ -49,7 +52,8 @@ function createAdminStore() {
           ...state,
           admin: data.admin,
           token: data.token,
-          loading: false
+          loading: false,
+          isAuthenticated: true
         }));
 
         return { success: true };
@@ -63,10 +67,10 @@ function createAdminStore() {
       if (browser) {
         localStorage.removeItem('admin_token');
       }
-      set({ admin: null, token: null, loading: false });
-      // Redirect to login
+      set({ admin: null, token: null, loading: false, isAuthenticated: false });
+      // Redirect to welcome page
       if (browser) {
-        window.location.href = '/admin/login';
+        window.location.href = '/admin/welcome';
       }
     },
     
@@ -78,7 +82,7 @@ function createAdminStore() {
       }
 
       try {
-        const response = await fetch('http://localhost:3000/api/auth/me', {
+        const response = await fetch(`${config.apiUrl}/auth/me`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -93,7 +97,8 @@ function createAdminStore() {
         update(state => ({
           ...state,
           admin,
-          token
+          token,
+          isAuthenticated: true
         }));
 
         return true;
@@ -101,7 +106,7 @@ function createAdminStore() {
         if (browser) {
           localStorage.removeItem('admin_token');
         }
-        set({ admin: null, token: null, loading: false });
+        set({ admin: null, token: null, loading: false, isAuthenticated: false });
         return false;
       }
     }
