@@ -42,6 +42,8 @@ export const UPLOAD_CONFIG = {
     'programs': 'programs',
     'news': 'news',
     'team': 'team',
+    'volunteers': 'volunteers',
+    'events': 'events',
     'general': 'general',
   },
 };
@@ -241,7 +243,7 @@ export async function secureFileUpload(
   // 7. Write file with restricted permissions
   await writeFile(filepath, buffer, { mode: 0o644 });
 
-  // 8. Return relative path
+  // 8. Return relative path for web access (with /uploads/ prefix)
   return `/uploads/${uploadFolder}/${secureFilename}`;
 }
 

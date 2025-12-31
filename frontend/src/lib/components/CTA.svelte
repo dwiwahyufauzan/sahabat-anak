@@ -2,16 +2,14 @@
   import { base } from '$app/paths';
   console.log('[v0] CTA section loaded');
 </script>
-
-<div class="min-h-screen">
   
   <!-- CTA Section -->
-  <div class="py-12 sm:py-16 md:py-20 px-4 relative overflow-hidden">
+  <div class="py-12 bg-white sm:py-16 md:py-20 px-4 relative overflow-hidden">
     <!-- Background gradient circles -->
     <div class="absolute inset-0 overflow-hidden pointer-events-none">
       <div class="absolute top-10 left-10 w-96 h-96 bg-linear-to-br from-indigo-400/20 to-purple-400/20 rounded-full blur-3xl"></div>
       <div class="absolute bottom-20 right-20 w-80 h-80 bg-linear-to-br from-blue-400/15 to-cyan-400/15 rounded-full blur-3xl"></div>
-      <div class="absolute top-1/2 left-1/3 w-72 h-72 bg-linear-to-br from-pink-400/10 to-rose-400/10 rounded-full blur-3xl"></div>
+      <div class="absolute top-1/2 left-1/3 w-72 h-72 bg-linear-to-br from-pink -400/10 to-rose-400/10 rounded-full blur-3xl"></div>
     </div>
 
     <div class="max-w-5xl mx-auto bg-linear-to-br from-indigo-500 via-blue-500 to-indigo-600 rounded-2xl sm:rounded-3xl md:rounded-[3rem] p-6 sm:p-8 md:p-16 text-center relative overflow-hidden shadow-2xl">
@@ -92,4 +90,4 @@
       </div>
     </div>
   </div>
-</div>
+

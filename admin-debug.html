@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Debug Helper</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #2563eb;
+        }
+        button.danger {
+            background: #ef4444;
+        }
+        button.danger:hover {
+            background: #dc2626;
+        }
+        button.success {
+            background: #10b981;
+        }
+        button.success:hover {
+            background: #059669;
+        }
+        .result {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 4px;
+            background: #f0f0f0;
+            font-family: monospace;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        .success-msg {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        .error-msg {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        h2 {
+            color: #1f2937;
+            margin-top: 0;
+        }
+        .status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .status.ok {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        .status.error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔧 Admin Debug Helper</h1>
+
+    <div class="card">
+        <h2>1. LocalStorage Status</h2>
+        <div id="storageStatus"></div>
+        <button onclick="checkStorage()">🔍 Check Storage</button>
+        <button class="danger" onclick="clearStorage()">🗑️ Clear Storage</button>
+        <div id="storageResult" class="result" style="display: none;"></div>
+    </div>
+
+    <div class="card">
+        <h2>2. Test API Connection</h2>
+        <button onclick="testPublicAPI()">📡 Test Public API</button>
+        <button onclick="testAdminAPI()">🔒 Test Admin API</button>
+        <div id="apiResult" class="result" style="display: none;"></div>
+    </div>
+
+    <div class="card">
+        <h2>3. Test Login</h2>
+        <input type="text" id="username" placeholder="Username" style="padding: 8px; margin: 5px; width: 200px;">
+        <input type="password" id="password" placeholder="Password" style="padding: 8px; margin: 5px; width: 200px;">
+        <br>
+        <button class="success" onclick="testLogin()">✅ Test Login</button>
+        <div id="loginResult" class="result" style="display: none;"></div>
+    </div>
+
+    <div class="card">
+        <h2>4. Quick Actions</h2>
+        <button onclick="goToAdmin()">🏠 Go to Admin Panel</button>
+        <button onclick="goToLogin()">🔑 Go to Login Page</button>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:3000/api';
+        
+        function checkStorage() {
+            const token = localStorage.getItem('admin_token');
+            const oldToken = localStorage.getItem('token');
+            const result = document.getElementById('storageResult');
+            
+            let html = '<strong>LocalStorage Keys:</strong>\n';
+            html += `admin_token: ${token ? '✅ EXISTS (' + token.substring(0, 20) + '...)' : '❌ NOT FOUND'}\n`;
+            html += `token: ${oldToken ? '⚠️ OLD KEY EXISTS (should be removed)' : '✅ Not present'}\n`;
+            html += `\nAll keys: ${JSON.stringify(Object.keys(localStorage), null, 2)}`;
+            
+            result.innerHTML = html;
+            result.style.display = 'block';
+            result.className = token ? 'result success-msg' : 'result error-msg';
+        }
+
+        function clearStorage() {
+            if (confirm('Are you sure? This will clear ALL localStorage and you need to login again.')) {
+                localStorage.clear();
+                const result = document.getElementById('storageResult');
+                result.innerHTML = '✅ LocalStorage cleared successfully!\nPlease login again.';
+                result.style.display = 'block';
+                result.className = 'result success-msg';
+            }
+        }
+
+        async function testPublicAPI() {
+            const result = document.getElementById('apiResult');
+            result.innerHTML = 'Testing public API...';
+            result.style.display = 'block';
+            
+            try {
+                const response = await fetch(`${API_URL}/programs`);
+                const data = await response.json();
+                
+                result.innerHTML = `✅ Public API Working!\n\nStatus: ${response.status}\nPrograms found: ${data.length}\n\nFirst program:\n${JSON.stringify(data[0], null, 2)}`;
+                result.className = 'result success-msg';
+            } catch (error) {
+                result.innerHTML = `❌ Public API Failed!\n\nError: ${error.message}`;
+                result.className = 'result error-msg';
+            }
+        }
+
+        async function testAdminAPI() {
+            const result = document.getElementById('apiResult');
+            const token = localStorage.getItem('admin_token');
+            
+            if (!token) {
+                result.innerHTML = '❌ No token found! Please login first.';
+                result.style.display = 'block';
+                result.className = 'result error-msg';
+                return;
+            }
+            
+            result.innerHTML = 'Testing admin API with token...';
+            result.style.display = 'block';
+            
+            try {
+                const response = await fetch(`${API_URL}/admin/programs`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                if (response.status === 401) {
+                    result.innerHTML = '❌ Unauthorized (401)\n\nToken is invalid or expired.\nPlease logout and login again.';
+                    result.className = 'result error-msg';
+                    return;
+                }
+                
+                const data = await response.json();
+                result.innerHTML = `✅ Admin API Working!\n\nStatus: ${response.status}\nPrograms found: ${data.length}`;
+                result.className = 'result success-msg';
+            } catch (error) {
+                result.innerHTML = `❌ Admin API Failed!\n\nError: ${error.message}`;
+                result.className = 'result error-msg';
+            }
+        }
+
+        async function testLogin() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const result = document.getElementById('loginResult');
+            
+            if (!username || !password) {
+                result.innerHTML = '❌ Please enter username and password';
+                result.style.display = 'block';
+                result.className = 'result error-msg';
+                return;
+            }
+            
+            result.innerHTML = 'Testing login...';
+            result.style.display = 'block';
+            
+            try {
+                const response = await fetch(`${API_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+                
+                if (!response.ok) {
+                    const error = await response.json();
+                    result.innerHTML = `❌ Login Failed!\n\nStatus: ${response.status}\nError: ${error.error || error.message || 'Unknown error'}`;
+                    result.className = 'result error-msg';
+                    return;
+                }
+                
+                const data = await response.json();
+                localStorage.setItem('admin_token', data.token);
+                
+                result.innerHTML = `✅ Login Successful!\n\nUsername: ${data.admin.username}\nEmail: ${data.admin.email}\nRole: ${data.admin.role}\n\nToken saved to localStorage as 'admin_token'\n\nYou can now test Admin API or go to Admin Panel.`;
+                result.className = 'result success-msg';
+            } catch (error) {
+                result.innerHTML = `❌ Login Failed!\n\nError: ${error.message}`;
+                result.className = 'result error-msg';
+            }
+        }
+
+        function goToAdmin() {
+            window.location.href = 'http://localhost:5174/admin';
+        }
+
+        function goToLogin() {
+            window.location.href = 'http://localhost:5174/admin/login';
+        }
+
+        // Auto-check storage on load
+        window.onload = checkStorage;
+    </script>
+</body>
+</html>

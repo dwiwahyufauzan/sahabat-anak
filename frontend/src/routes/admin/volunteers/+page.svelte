@@ -21,6 +21,10 @@
   let showDetailModal = false;
   let detailVolunteer: any = null;
   
+  // Photo upload for admin form
+  let adminPhotoFile: File | null = null;
+  let adminPhotoPreview = '';
+  
   // Form data for adding volunteer
   let newVolunteer = {
     name: '',
@@ -115,11 +119,53 @@
       status: 'pending'
     };
     formErrors = {};
+    adminPhotoFile = null;
+    adminPhotoPreview = '';
     showAddModal = true;
   };
 
   const closeAddModal = () => {
     showAddModal = false;
+    adminPhotoFile = null;
+    adminPhotoPreview = '';
+  };
+
+  const handleAdminPhotoChange = (e: Event) => {
+    const target = e.target as HTMLInputElement;
+    const file = target.files?.[0];
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        formErrors.photo = 'File harus berupa gambar';
+        adminPhotoFile = null;
+        adminPhotoPreview = '';
+        return;
+      }
+      
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        formErrors.photo = 'Ukuran file maksimal 5MB';
+        adminPhotoFile = null;
+        adminPhotoPreview = '';
+        return;
+      }
+      
+      adminPhotoFile = file;
+      formErrors.photo = '';
+      
+      // Create preview
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        adminPhotoPreview = e.target?.result as string || '';
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removeAdminPhoto = () => {
+    adminPhotoFile = null;
+    adminPhotoPreview = '';
+    formErrors.photo = '';
   };
 
   const validateEmail = (email: string) => {
@@ -163,16 +209,22 @@
 
     isSubmitting = true;
     try {
-      await adminApi.volunteers.create({
-        name: newVolunteer.name,
-        email: newVolunteer.email,
-        phone: newVolunteer.phone,
-        address: newVolunteer.address || '',
-        skills: newVolunteer.skills || '',
-        motivation: newVolunteer.motivation || '',
-        availability: newVolunteer.availability || '',
-        status: newVolunteer.status
-      });
+      // Create FormData for file upload
+      const formDataToSend = new FormData();
+      formDataToSend.append('name', newVolunteer.name);
+      formDataToSend.append('email', newVolunteer.email);
+      formDataToSend.append('phone', newVolunteer.phone);
+      formDataToSend.append('address', newVolunteer.address || '');
+      formDataToSend.append('skills', newVolunteer.skills || '');
+      formDataToSend.append('motivation', newVolunteer.motivation || '');
+      formDataToSend.append('availability', newVolunteer.availability || '');
+      formDataToSend.append('status', newVolunteer.status);
+      
+      if (adminPhotoFile) {
+        formDataToSend.append('photo', adminPhotoFile);
+      }
+      
+      await adminApi.volunteers.create(formDataToSend);
       
       successMessage = `Relawan "${newVolunteer.name}" berhasil ditambahkan`;
       showSuccessModal = true;
@@ -225,7 +277,7 @@
       on:click={openAddModal}
       class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition-colors flex items-center gap-2 shadow-lg hover:shadow-xl"
     >
-      <Icon name="plus" className="w-5 h-5" />
+      <Icon name="user-plus" className="w-5 h-5" />
       Tambah Relawan
     </button>
   </div>
@@ -336,6 +388,7 @@
         <table class="min-w-full divide-y divide-gray-200">
           <thead class="bg-linear-to-r from-blue-50 to-blue-100">
             <tr>
+              <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Foto</th>
               <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Nama</th>
               <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Kontak</th>
               <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Keahlian</th>
@@ -347,6 +400,29 @@
           <tbody class="bg-white divide-y divide-gray-200">
             {#each filteredVolunteers as volunteer}
               <tr class="hover:bg-gray-50 transition-colors">
+                <td class="px-4 py-3">
+                  {#if volunteer.photo}
+                    <img 
+                      src={`http://localhost:3000/uploads/${volunteer.photo}`} 
+                      alt={volunteer.name}
+                      class="w-16 h-16 rounded-lg object-cover border-2 border-gray-200 shadow-sm"
+                      on:error={(e) => { 
+                        const target = e.target as HTMLImageElement | null;
+                        if (target) {
+                          target.style.display = 'none';
+                          target.nextElementSibling?.setAttribute('style', 'display: flex;');
+                        }
+                      }}
+                    />
+                    <div class="w-16 h-16 rounded-full bg-linear-to-br from-blue-100 to-blue-200 items-center justify-center border-2 border-gray-200" style="display: none;">
+                      <Icon name="user" className="w-8 h-8 text-blue-600" />
+                    </div>
+                  {:else}
+                    <div class="w-16 h-16 rounded-full bg-linear-to-br from-blue-100 to-blue-200 flex items-center justify-center border-2 border-gray-200">
+                      <Icon name="user" className="w-8 h-8 text-blue-600" />
+                    </div>
+                  {/if}
+                </td>
                 <td class="px-4 py-3">
                   <p class="font-semibold text-gray-800 text-sm">{volunteer.name}</p>
                 </td>
@@ -376,10 +452,10 @@
                   </select>
                 </td>
                 <td class="px-4 py-3">
-                  <div class="flex gap-2">
+                  <div class="flex flex-col gap-1">
                     <button
                       on:click={() => showDetail(volunteer)}
-                      class="px-3 py-1 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-lg text-xs font-medium transition-colors flex items-center gap-1"
+                      class="px-3 py-1 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-lg text-xs font-medium transition-colors flex items-center justify-center gap-1"
                     >
                       <Icon name="eye" className="w-3 h-3" />
                       Detail
@@ -387,7 +463,7 @@
                     <button
                       on:click={() => openDeleteModal(volunteer.id, volunteer.name)}
                       disabled={deletingId === volunteer.id}
-                      class="px-3 py-1 bg-red-100 hover:bg-red-200 disabled:bg-gray-100 text-red-700 disabled:text-gray-400 rounded-lg text-xs font-medium transition-colors flex items-center gap-1"
+                      class="px-3 py-1 bg-red-100 hover:bg-red-200 disabled:bg-gray-100 text-red-700 disabled:text-gray-400 rounded-lg text-xs font-medium transition-colors flex items-center justify-center gap-1"
                     >
                       {#if deletingId === volunteer.id}
                         <div class="w-3 h-3 border-2 border-red-700 border-t-transparent rounded-full animate-spin"></div>
@@ -536,6 +612,32 @@
 
       <!-- Content -->
       <div class="space-y-4">
+        <!-- Photo -->
+        {#if detailVolunteer.photo}
+          <div class="flex justify-center mb-4">
+            <div class="relative">
+              <img 
+                src={`http://localhost:3000/uploads/${detailVolunteer.photo}`} 
+                alt={detailVolunteer.name}
+                class="w-60 h-80 rounded-2xl object-cover border-4 border-blue-100 shadow-lg"
+                on:error={(e) => { 
+                  const target = e.target as HTMLImageElement | null;
+                  if (target) {
+                    target.style.display = 'none';
+                    target.nextElementSibling?.setAttribute('style', 'display: flex;');
+                  }
+                }}
+              />
+              <div class="w-60 h-80 rounded-2xl bg-linear-to-br from-blue-100 to-blue-200 items-center justify-center border-4 border-gray-200 shadow-lg absolute top-0 left-0" style="display: none;">
+                <Icon name="user" className="w-32 h-32 text-blue-600" />
+              </div>
+              <div class="absolute -bottom-2 -right-2 w-10 h-10 bg-green-500 rounded-full border-4 border-white flex items-center justify-center">
+                <Icon name="check" className="w-5 h-5 text-white" />
+              </div>
+            </div>
+          </div>
+        {/if}
+
         <!-- Personal Info -->
         <div class="bg-gray-50 p-4 rounded-xl">
           <h4 class="font-semibold text-gray-800 mb-3 flex items-center gap-2">
@@ -773,6 +875,55 @@
             <option value="Fleksibel">Fleksibel</option>
             <option value="Hanya event tertentu">Hanya event tertentu</option>
           </select>
+        </div>
+
+        <!-- Photo Upload -->
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-2" for="admin-photo">
+            Foto Profil
+          </label>
+          {#if adminPhotoPreview}
+            <div class="relative w-full rounded-xl bg-gray-50 border-2 border-gray-200 p-4">
+              <div class="flex items-center gap-4">
+                <div class="relative w-20 h-20 rounded-lg overflow-hidden shadow-md">
+                  <img src={adminPhotoPreview} alt="Preview" class="w-full h-full object-cover" />
+                </div>
+                <div class="flex-1">
+                  <p class="text-sm font-medium text-gray-900 mb-1">Foto siap diupload</p>
+                  <p class="text-xs text-gray-500">{adminPhotoFile?.name}</p>
+                </div>
+                <button
+                  type="button"
+                  on:click={removeAdminPhoto}
+                  class="px-3 py-2 bg-red-500 hover:bg-red-600 text-white text-sm font-medium rounded-lg transition-all"
+                >
+                  Hapus
+                </button>
+              </div>
+            </div>
+          {:else}
+            <label
+              for="admin-photo"
+              class="w-full min-h-24 rounded-xl bg-gray-50 border-2 border-dashed border-gray-300 hover:border-blue-500 hover:bg-blue-50 p-4 cursor-pointer flex flex-col items-center justify-center gap-2 transition-all"
+              class:border-red-500={formErrors.photo}
+            >
+              <Icon name="image" className="w-8 h-8 text-gray-400" />
+              <div class="text-center">
+                <p class="text-sm font-medium text-gray-700">Klik untuk upload foto</p>
+                <p class="text-xs text-gray-500">JPG, PNG, WEBP (Max 5MB)</p>
+              </div>
+              <input
+                type="file"
+                id="admin-photo"
+                accept="image/*"
+                on:change={handleAdminPhotoChange}
+                class="hidden"
+              />
+            </label>
+          {/if}
+          {#if formErrors.photo}
+            <p class="text-red-500 text-xs mt-1">{formErrors.photo}</p>
+          {/if}
         </div>
 
         <!-- Status -->

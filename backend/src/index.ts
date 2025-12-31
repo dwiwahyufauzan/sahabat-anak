@@ -12,6 +12,7 @@ import { adminDonationRoutes } from './routes/admin/donations';
 import { adminVolunteerRoutes } from './routes/admin/volunteers';
 import { adminContactRoutes } from './routes/admin/contacts';
 import { adminTeamRoutes } from './routes/admin/team';
+import { adminEventRoutes } from './routes/admin/events';
 import { uploadRoutes } from './routes/admin/upload';
 
 const app = new Elysia()
@@ -68,6 +69,7 @@ const app = new Elysia()
   .use(adminVolunteerRoutes)
   .use(adminContactRoutes)
   .use(adminTeamRoutes)
+  .use(adminEventRoutes)
   .listen(env.PORT);
 
 console.log(`🚀 Server is running on http://localhost:${app.server?.port}`);

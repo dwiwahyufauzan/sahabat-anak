@@ -15,7 +15,8 @@ export const formErrors = writable({
   name: '',
   email: '',
   phone: '',
-  category: ''
+  category: '',
+  photo: ''
 });
 
 export const isSubmitting = writable(false);
@@ -35,6 +36,7 @@ export function resetForm() {
     name: '',
     email: '',
     phone: '',
-    category: ''
+    category: '',
+    photo: ''
   });
 }

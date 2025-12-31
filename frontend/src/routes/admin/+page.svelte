@@ -12,7 +12,9 @@
     totalVolunteers: 0,
     totalContacts: 0,
     totalPrograms: 0,
-    totalNews: 0
+    totalNews: 0,
+    totalEvents: 0,
+    upcomingEvents: 0
   };
 
   let recentDonations: any[] = [];
@@ -37,12 +39,15 @@
     loading = true;
     error = '';
     try {
-      const [donations, volunteers, programs, news, contacts] = await Promise.all([
+      const [donations, volunteers, programs, news, contacts, events] = await Promise.all([
         adminApi.donations.getAll(),
         adminApi.volunteers.getAll(),
         adminApi.programs.getAll(),
         adminApi.news.getAll(),
-        adminApi.contacts.getAll()
+        adminApi.contacts.getAll(),
+        fetch('http://localhost:3000/api/admin/events', {
+          headers: { 'Authorization': `Bearer ${localStorage.getItem('adminToken')}` }
+        }).then(res => res.json()).catch(() => [])
       ]);
       
       // Filter hanya donasi yang sudah dikonfirmasi (completed/verified)
@@ -61,7 +66,9 @@
         totalVolunteers: approvedVolunteers.length,
         totalContacts: contacts.filter((c: any) => c.status === 'unread').length,
         totalPrograms: programs.length,
-        totalNews: news.length
+        totalNews: news.length,
+        totalEvents: Array.isArray(events) ? events.length : 0,
+        upcomingEvents: Array.isArray(events) ? events.filter((e: any) => e.status === 'upcoming').length : 0
       };
       recentDonations = donations.slice(0, 5);
       recentVolunteers = volunteers.slice(0, 5);
@@ -382,6 +389,20 @@
           </div>
           <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
             <Icon name="folder" className="w-6 h-6 text-blue-500" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Event -->
+      <div class="bg-white rounded-xl shadow-sm hover:shadow-md transition-all p-4 border border-gray-200">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm text-gray-600 mb-1">Event</p>
+            <p class="text-2xl font-bold text-gray-900">{stats.totalEvents}</p>
+            <p class="text-xs text-green-600 font-medium mt-1">{stats.upcomingEvents} Upcoming</p>
+          </div>
+          <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+            <Icon name="calendar" className="w-6 h-6 text-green-500" />
           </div>
         </div>
       </div>

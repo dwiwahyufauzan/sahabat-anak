@@ -10,6 +10,11 @@
   let modalType = $state('success');
   let modalTitle = $state('');
   let modalMessage = $state('');
+  
+  // Photo upload
+  /** @type {File | null} */
+  let photoFile = $state(null);
+  let photoPreview = $state('');
 
   /**
    * @param {string} email
@@ -27,13 +32,55 @@
     return re.test(phone.replace(/\s/g, ''));
   }
 
+  /**
+   * @param {Event} e
+   */
+  function handlePhotoChange(e) {
+    const input = /** @type {HTMLInputElement} */ (e.target);
+    const file = input.files?.[0];
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        $formErrors.photo = 'File harus berupa gambar';
+        photoFile = null;
+        photoPreview = '';
+        return;
+      }
+      
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        $formErrors.photo = 'Ukuran file maksimal 5MB';
+        photoFile = null;
+        photoPreview = '';
+        return;
+      }
+      
+      photoFile = file;
+      $formErrors.photo = '';
+      
+      // Create preview
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        photoPreview = /** @type {string} */ (e.target?.result) || '';
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  function removePhoto() {
+    photoFile = null;
+    photoPreview = '';
+    $formErrors.photo = '';
+  }
+
   async function handleSubmit() {
     // Reset errors
     $formErrors = {
       name: '',
       email: '',
       phone: '',
-      category: ''
+      category: '',
+      photo: ''
     };
 
     let hasError = false;
@@ -71,23 +118,42 @@
     $isSubmitting = true;
     
     try {
+      // Create FormData for file upload
+      const formDataToSend = new FormData();
+      formDataToSend.append('name', $formData.name);
+      formDataToSend.append('email', $formData.email);
+      formDataToSend.append('phone', $formData.phone);
+      formDataToSend.append('address', $formData.address || '');
+      formDataToSend.append('skills', $formData.skills || '');
+      formDataToSend.append('motivation', $formData.motivation || '');
+      formDataToSend.append('availability', $formData.availability || '');
+      
+      if (photoFile) {
+        console.log('Adding photo to FormData:', {
+          name: photoFile.name,
+          type: photoFile.type,
+          size: photoFile.size
+        });
+        formDataToSend.append('photo', photoFile);
+      } else {
+        console.log('No photo file to upload');
+      }
+      
+      console.log('Sending FormData to API...');
+      
       // Submit to backend API
-      await api.createVolunteer({
-        name: $formData.name,
-        email: $formData.email,
-        phone: $formData.phone,
-        address: $formData.address || '',
-        skills: $formData.skills || '',
-        motivation: $formData.motivation || '',
-        availability: $formData.availability || ''
-      });
+      await api.createVolunteer(formDataToSend);
       
       modalType = 'success';
       modalTitle = 'Pendaftaran Berhasil!';
       modalMessage = `Terima kasih ${$formData.name}! Pendaftaran Anda telah diterima. Kami akan menghubungi Anda melalui email di ${$formData.email}`;
       showModal = true;
       
-      setTimeout(() => resetForm(), 2000);
+      setTimeout(() => {
+        resetForm();
+        photoFile = null;
+        photoPreview = '';
+      }, 2000);
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Silakan coba lagi.';
       modalType = 'error';
@@ -278,6 +344,57 @@
             <span class="material-symbols-outlined group-focus-within:rotate-180 transition-transform duration-300">expand_more</span>
           </div>
         </div>
+      </div>
+
+      <!-- Photo Upload Field -->
+      <div class="flex flex-col gap-2">
+        <label class="text-sky-900 text-sm font-bold ml-4" for="photo">Foto Profil (Opsional)</label>
+        <div class="relative group">
+          {#if photoPreview}
+            <div class="relative w-full rounded-3xl bg-sky-50/50 border-2 border-sky-100 p-6">
+              <div class="flex items-center gap-6">
+                <div class="relative w-32 h-32 rounded-2xl overflow-hidden shadow-lg">
+                  <img src={photoPreview} alt="Preview" class="w-full h-full object-cover" />
+                </div>
+                <div class="flex-1">
+                  <p class="text-sky-900 font-bold mb-2">Foto siap diupload</p>
+                  <p class="text-sky-400 text-sm mb-4">{photoFile?.name}</p>
+                  <button
+                    type="button"
+                    onclick={removePhoto}
+                    class="px-4 py-2 bg-red-500 hover:bg-red-600 text-white text-sm font-bold rounded-xl transition-all"
+                  >
+                    <span class="material-symbols-outlined text-sm align-middle mr-1">delete</span>
+                    Hapus Foto
+                  </button>
+                </div>
+              </div>
+            </div>
+          {:else}
+            <label
+              for="photo"
+              class="w-full min-h-32 rounded-3xl bg-sky-50/50 border-2 border-sky-100 border-dashed hover:border-primary hover:bg-primary/5 text-sky-900 p-6 focus-within:ring-4 focus-within:ring-primary/20 focus-within:border-primary transition-all cursor-pointer flex flex-col items-center justify-center gap-3"
+              class:border-red-500={$formErrors.photo}
+            >
+              <span class="material-symbols-outlined text-[48px] text-sky-400 group-hover:text-primary transition-colors">add_photo_alternate</span>
+              <div class="text-center">
+                <p class="text-sky-900 font-bold mb-1">Klik untuk upload foto</p>
+                <p class="text-sky-400 text-sm">Format: JPG, PNG, WEBP (Max 5MB)</p>
+              </div>
+              <input
+                type="file"
+                id="photo"
+                accept="image/*"
+                onchange={handlePhotoChange}
+                class="hidden"
+              />
+            </label>
+          {/if}
+        </div>
+        {#if $formErrors.photo}
+          <span class="text-red-500 text-xs ml-4">{$formErrors.photo}</span>
+        {/if}
+        <p class="text-sky-400 text-xs ml-4">Upload foto terbaik Anda untuk profil relawan</p>
       </div>
 
       <!-- Submit Button -->

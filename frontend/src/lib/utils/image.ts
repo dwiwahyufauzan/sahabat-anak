@@ -20,5 +20,7 @@ export function getImageUrl(imagePath: string | null | undefined): string {
   }
   
   // If relative path, prepend backend URL
-  return `${BACKEND_URL}${imagePath}`;
+  // Make sure path starts with /
+  const normalizedPath = imagePath.startsWith('/') ? imagePath : `/${imagePath}`;
+  return `${BACKEND_URL}${normalizedPath}`;
 }

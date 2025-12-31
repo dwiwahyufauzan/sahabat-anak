@@ -153,6 +153,23 @@ news: {
     },
     
     create: async (data: any) => {
+      // Check if data is FormData
+      if (data instanceof FormData) {
+        const headers: any = {};
+        const token = browser ? localStorage.getItem('admin_token') : null;
+        if (token) {
+          headers['Authorization'] = `Bearer ${token}`;
+        }
+        
+        const response = await fetch(`${API_BASE}/admin/volunteers`, {
+          method: 'POST',
+          headers,
+          body: data
+        });
+        return handleResponse(response);
+      }
+      
+      // Otherwise use JSON
       const response = await fetch(`${API_BASE}/admin/volunteers`, {
         method: 'POST',
         headers: getAuthHeaders(),

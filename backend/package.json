@@ -13,7 +13,8 @@
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
-    "admin:create": "bun src/scripts/create-admin.ts"
+    "admin:create": "bun src/scripts/create-admin.ts",
+    "events:create-table": "bun src/scripts/create-events-table.ts"
   },
   "dependencies": {
     "@elysiajs/cors": "^1.1.0",

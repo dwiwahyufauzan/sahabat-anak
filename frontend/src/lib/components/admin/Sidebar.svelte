@@ -99,6 +99,13 @@
       description: 'Kelola Program'
     },
     { 
+      href: '/admin/events', 
+      label: 'Event', 
+      icon: 'calendar',
+      gradient: 'from-purple-500 to-purple-600',
+      description: 'Kelola Event'
+    },
+    { 
       href: '/admin/news', 
       label: 'Berita', 
       icon: 'news',

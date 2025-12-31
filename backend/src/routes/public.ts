@@ -5,6 +5,7 @@ import { DonationController } from '../controllers/donation.controller';
 import { VolunteerController } from '../controllers/volunteer.controller';
 import { ContactController } from '../controllers/contact.controller';
 import { TeamController } from '../controllers/team.controller';
+import { EventController } from '../controllers/event.controller';
 import { secureFileUpload } from '../utils/secureUpload';
 
 export const publicRoutes = new Elysia({ prefix: '/api' })
@@ -18,6 +19,25 @@ export const publicRoutes = new Elysia({ prefix: '/api' })
     } catch (error) {
       set.status = 404;
       return { error: error instanceof Error ? error.message : 'Program not found' };
+    }
+  })
+  
+  // Events routes
+  .get('/events', async () => {
+    return await EventController.getAllActive();
+  })
+  .get('/events/upcoming', async () => {
+    return await EventController.getUpcoming();
+  })
+  .get('/events/completed', async () => {
+    return await EventController.getCompleted();
+  })
+  .get('/events/:slug', async ({ params, set }) => {
+    try {
+      return await EventController.getBySlug(params.slug);
+    } catch (error) {
+      set.status = 404;
+      return { error: error instanceof Error ? error.message : 'Event not found' };
     }
   })
   
@@ -88,23 +108,57 @@ export const publicRoutes = new Elysia({ prefix: '/api' })
   // Volunteers routes
   .post(
     '/volunteers',
-    async ({ body }) => {
+    async ({ body, set, headers }) => {
       try {
-        return await VolunteerController.create(body);
+        let photoPath;
+        
+        // Check if it's a multipart/form-data request (file upload)
+        const contentType = headers['content-type'] || '';
+        const isFormData = contentType.includes('multipart/form-data');
+        
+        console.log('Content-Type:', contentType);
+        console.log('Is FormData:', isFormData);
+        
+        // Handle file upload if present with secure validation
+        // Type assertion for accessing photo property
+        const bodyWithPhoto = body as any;
+        console.log('Body has photo:', !!bodyWithPhoto.photo);
+        
+        if (bodyWithPhoto.photo && typeof bodyWithPhoto.photo === 'object') {
+          console.log('Photo object:', {
+            name: bodyWithPhoto.photo.name,
+            type: bodyWithPhoto.photo.type,
+            size: bodyWithPhoto.photo.size
+          });
+          
+          try {
+            photoPath = await secureFileUpload(
+              bodyWithPhoto.photo,
+              'volunteers',
+              'image'
+            );
+            console.log('Photo uploaded to:', photoPath);
+          } catch (uploadError) {
+            console.error('Photo upload error:', uploadError);
+            // Continue without photo if upload fails
+          }
+        }
+        
+        // Remove photo file from body and add the path instead
+        const { photo, ...volunteerData } = bodyWithPhoto;
+        
+        return await VolunteerController.create({
+          ...volunteerData,
+          photo: photoPath,
+        });
       } catch (error) {
+        console.error('Volunteer creation error:', error);
+        set.status = 400;
         return { error: error instanceof Error ? error.message : 'Failed to submit volunteer form' };
       }
     },
     {
-      body: t.Object({
-        name: t.String(),
-        email: t.String(),
-        phone: t.Optional(t.String()),
-        address: t.Optional(t.String()),
-        skills: t.Optional(t.String()),
-        motivation: t.Optional(t.String()),
-        availability: t.Optional(t.String()),
-      }),
+      body: t.Any() // Use t.Any() to accept any body format
     }
   )
   

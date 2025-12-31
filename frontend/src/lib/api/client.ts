@@ -81,7 +81,7 @@ class ApiClient {
   }
 
   // Volunteers
-  async createVolunteer(data: {
+  async createVolunteer(data: FormData | {
     name: string;
     email: string;
     phone?: string;
@@ -90,6 +90,22 @@ class ApiClient {
     motivation?: string;
     availability?: string;
   }) {
+    // Check if data is FormData
+    if (data instanceof FormData) {
+      const response = await fetch(`${this.baseUrl}/api/volunteers`, {
+        method: 'POST',
+        body: data,
+      });
+
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({ error: 'Unknown error' }));
+        throw new Error(error.error || `HTTP ${response.status}`);
+      }
+
+      return response.json();
+    }
+    
+    // Otherwise, use JSON
     return this.request('/api/volunteers', {
       method: 'POST',
       body: JSON.stringify(data),
@@ -283,6 +299,23 @@ class ApiClient {
   // Team (Public)
   async getTeam() {
     return this.request('/api/team');
+  }
+
+  // Events (Public)
+  async getEvents() {
+    return this.request('/api/events');
+  }
+
+  async getUpcomingEvents() {
+    return this.request('/api/events/upcoming');
+  }
+
+  async getCompletedEvents() {
+    return this.request('/api/events/completed');
+  }
+
+  async getEventBySlug(slug: string) {
+    return this.request(`/api/events/${slug}`);
   }
 }
 

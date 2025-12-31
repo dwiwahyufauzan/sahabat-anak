@@ -17,10 +17,10 @@
   };
 </script>
 
-<div class="flex flex-col bg-white rounded-2xl sm:rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-100 group">
+<div class="flex flex-col bg-white rounded-2xl sm:rounded-3xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-200 group">
     <!-- Image -->
     <div class="relative h-48 sm:h-56 md:h-64 overflow-hidden">
-        <div class="absolute inset-0 bg-primary/20 z-10 opacity-0 group-hover:opacity-10 transition-opacity"></div>
+        <div class="absolute inset-0 bg-blue-500/20 z-10 opacity-0 group-hover:opacity-10 transition-opacity"></div>
         <div 
             class="w-full h-full bg-cover bg-center transition-transform duration-500 group-hover:scale-110"
             style="background-image: url('{getImageUrl(program.image)}');"
@@ -28,16 +28,16 @@
             aria-label={program.alt}>
         </div>
         <div class="absolute top-4 right-4 bg-white p-2 rounded-full shadow-md z-20">
-            <span class="material-symbols-outlined text-primary text-2xl">{program.icon}</span>
+            <span class="material-symbols-outlined text-blue-500 text-2xl">{program.icon}</span>
         </div>
     </div>
     
     <!-- Content -->
     <div class="p-5 sm:p-6 md:p-8 flex flex-col flex-1">
-        <h3 class="text-xl sm:text-2xl font-bold text-text-main mb-2 sm:mb-3">{program.title}</h3>
-        <p class="text-sm sm:text-base text-text-sub mb-4 sm:mb-5 md:mb-6 leading-relaxed flex-1">{program.description}</p>
+        <h3 class="text-xl sm:text-2xl font-bold text-slate-900 mb-2 sm:mb-3">{program.title}</h3>
+        <p class="text-sm sm:text-base text-slate-600 mb-4 sm:mb-5 md:mb-6 leading-relaxed flex-1">{program.description}</p>
         
-        <a href="{base}/program/{program.slug}" class="w-full py-2.5 sm:py-3 rounded-lg sm:rounded-xl bg-gray-200 hover:bg-blue-400 hover:text-white text-primary text-sm sm:text-base font-bold transition-colors flex items-center justify-center gap-2 group/btn">
+        <a href="{base}/program/{program.slug}" class="w-full py-2.5 sm:py-3 rounded-lg sm:rounded-xl bg-slate-200 hover:bg-blue-500 hover:text-white text-blue-600 text-sm sm:text-base font-bold transition-colors flex items-center justify-center gap-2 group/btn">
             Pelajari Lebih Lanjut
             <span class="material-symbols-outlined text-sm group-hover/btn:translate-x-1 transition-transform">
                 arrow_forward

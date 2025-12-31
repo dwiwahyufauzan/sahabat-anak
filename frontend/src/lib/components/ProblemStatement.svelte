@@ -20,21 +20,21 @@
     });
 </script>
 
-<section id="problem-statement" class="py-20 bg-white dark:bg-[#101c22]">
+<section id="problem-statement" class="py-20 bg-white">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
             <!-- Text Content -->
             <div class="flex-1 order-2 lg:order-1">
-                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-100 dark:bg-orange-900/30 text-accent text-xs font-bold uppercase tracking-wider mb-4 animate-slide-up"
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-100 text-accent text-xs font-bold uppercase tracking-wider mb-4 animate-slide-up"
                      style="animation-delay: 0.1s; opacity: {isVisible ? 1 : 0}; transform: translateY({isVisible ? 0 : '20px'});">
                     <span class="material-symbols-outlined text-sm">warning</span>
                     Tantangan Saat Ini
                 </div>
-                <h2 class="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-6 leading-tight animate-fade-in"
+                <h2 class="text-3xl md:text-4xl font-bold text-slate-900 mb-6 leading-tight animate-fade-in"
                     style="animation-delay: 0.2s; opacity: {isVisible ? 1 : 0};">
                     Anak Adalah Aset <span class="text-primary">Berharga Bangsa</span>
                 </h2>
-                <div class="space-y-6 text-slate-600 dark:text-slate-300 text-lg leading-relaxed">
+                <div class="space-y-6 text-slate-600 text-lg leading-relaxed">
                     <p class="animate-fade-in" style="animation-delay: 0.3s; opacity: {isVisible ? 1 : 0};">
                         Anak adalah generasi penerus yang akan menentukan masa depan Indonesia. Namun, kenyataannya masih banyak anak yang menghadapi berbagai tantangan, mulai dari keterbatasan akses pendidikan, kurangnya ruang kreatif, hingga lemahnya pendampingan keluarga.
                     </p>
@@ -46,7 +46,7 @@
             
             <!-- Image -->
             <div class="flex-1 order-1 lg:order-2">
-                <div class="relative rounded-2xl md:rounded-[3rem] overflow-hidden aspect-4/3 shadow-2xl shadow-slate-200 dark:shadow-black/50 group hover:shadow-primary/20 transition-shadow duration-500">
+                <div class="relative rounded-2xl md:rounded-[3rem] overflow-hidden aspect-4/3 shadow-2xl shadow-slate-200 group hover:shadow-primary/20 transition-shadow duration-500">
                     <img 
                         alt="Thoughtful young child looking out a window representing future challenges" 
                         class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" 

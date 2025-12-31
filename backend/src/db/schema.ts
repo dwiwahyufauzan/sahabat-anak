@@ -1,4 +1,4 @@
-import { mysqlTable, varchar, text, timestamp, int, decimal, mysqlEnum, json } from 'drizzle-orm/mysql-core';
+import { mysqlTable, varchar, text, timestamp, datetime, int, decimal, mysqlEnum, json } from 'drizzle-orm/mysql-core';
 
 // Admin table
 export const admins = mysqlTable('admins', {
@@ -83,6 +83,7 @@ export const volunteers = mysqlTable('volunteers', {
   skills: text('skills'),
   motivation: text('motivation'),
   availability: varchar('availability', { length: 100 }),
+  photo: varchar('photo', { length: 255 }),
   status: mysqlEnum('status', ['pending', 'approved', 'rejected']).default('pending'),
   createdAt: timestamp('created_at').defaultNow(),
 });
@@ -112,4 +113,24 @@ export const teamMembers = mysqlTable('team_members', {
   order: int('order').default(0),
   isActive: int('is_active').default(1),
   createdAt: timestamp('created_at').defaultNow(),
+});
+
+// Events table
+export const events = mysqlTable('events', {
+  id: int('id').primaryKey().autoincrement(),
+  slug: varchar('slug', { length: 255 }).notNull().unique(),
+  name: varchar('name', { length: 255 }).notNull(),
+  description: text('description').notNull(),
+  venue: varchar('venue', { length: 255 }).notNull(), // Tempat
+  eventType: mysqlEnum('event_type', ['offline', 'online']).notNull(), // Offline/Online
+  objectives: text('objectives'), // Tujuan
+  targetAudience: varchar('target_audience', { length: 255 }), // Target audiens
+  startDate: datetime('start_date').notNull(), // Tanggal mulai
+  endDate: datetime('end_date').notNull(), // Tanggal berakhir
+  startTime: varchar('start_time', { length: 10 }).notNull(), // Jam mulai (HH:MM)
+  endTime: varchar('end_time', { length: 10 }).notNull(), // Jam berakhir (HH:MM)
+  image: varchar('image', { length: 255 }), // Foto event
+  status: mysqlEnum('status', ['upcoming', 'ongoing', 'completed', 'cancelled']).default('upcoming'),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow().onUpdateNow(),
 });

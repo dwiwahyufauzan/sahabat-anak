@@ -37,6 +37,31 @@ export const authRoutes = new Elysia({ prefix: '/api/auth' })
       exp: '7d',
     })
   )
+  .get(
+    '/me',
+    async ({ headers, jwt, set }) => {
+      try {
+        const authHeader = headers.authorization;
+        if (!authHeader || !authHeader.startsWith('Bearer ')) {
+          set.status = 401;
+          return { error: 'No token provided' };
+        }
+
+        const token = authHeader.substring(7);
+        const payload = await jwt.verify(token);
+
+        if (!payload) {
+          set.status = 401;
+          return { error: 'Invalid token' };
+        }
+
+        return payload;
+      } catch (error) {
+        set.status = 401;
+        return { error: 'Invalid token' };
+      }
+    }
+  )
   .post(
     '/login',
     async ({ body, jwt, set, request }) => {

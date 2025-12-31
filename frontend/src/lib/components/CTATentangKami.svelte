@@ -91,7 +91,7 @@
                  tabindex="0"
                  onclick={() => showDonationForm = false}
                  onkeydown={(e) => e.key === 'Escape' && (showDonationForm = false)}>
-                <div class="bg-white dark:bg-[#15232b] rounded-2xl p-8 max-w-md w-full" 
+                <div class="bg-white rounded-2xl p-8 max-w-md w-full" 
                      role="dialog"
                      aria-modal="true"
                      tabindex="-1"
@@ -138,7 +138,7 @@
                  tabindex="0"
                  onclick={() => showVolunteerForm = false}
                  onkeydown={(e) => e.key === 'Escape' && (showVolunteerForm = false)}>
-                <div class="bg-white dark:bg-[#15232b] rounded-2xl p-8 max-w-md w-full" 
+                <div class="bg-white rounded-2xl p-8 max-w-md w-full" 
                      role="dialog"
                      aria-modal="true"
                      tabindex="-1"

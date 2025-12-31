@@ -18,7 +18,7 @@ interface AdminState {
 
 const initialState: AdminState = {
   admin: null,
-  token: browser ? localStorage.getItem('admin_token') : null,
+  token: browser ? localStorage.getItem('adminToken') : null,
   loading: false,
   isAuthenticated: false // Always start as false, will be set by checkAuth
 };
@@ -45,7 +45,7 @@ function createAdminStore() {
         const data = await response.json();
         
         if (browser) {
-          localStorage.setItem('admin_token', data.token);
+          localStorage.setItem('adminToken', data.token);
         }
 
         update(state => ({
@@ -65,7 +65,7 @@ function createAdminStore() {
     
     logout: () => {
       if (browser) {
-        localStorage.removeItem('admin_token');
+        localStorage.removeItem('adminToken');
       }
       set({ admin: null, token: null, loading: false, isAuthenticated: false });
       // Redirect to welcome page
@@ -75,7 +75,7 @@ function createAdminStore() {
     },
     
     checkAuth: async () => {
-      const token = browser ? localStorage.getItem('admin_token') : null;
+      const token = browser ? localStorage.getItem('adminToken') : null;
       
       if (!token) {
         return false;
